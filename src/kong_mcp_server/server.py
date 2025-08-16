@@ -18,7 +18,7 @@ async def hello_world() -> str:
 async def main() -> None:
     """Main entry point for the MCP server."""
     from fastmcp.transports.sse import SseServerTransport
-    
+
     async with SseServerTransport() as transport:
         await mcp.run(transport)
 
