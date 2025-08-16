@@ -64,7 +64,7 @@ jobs:
     
     - name: Get version
       id: version
-      run: echo "VERSION=$(python scripts/version.py)" >> $GITHUB_OUTPUT
+      run: echo "VERSION=$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")" >> $GITHUB_OUTPUT
     
     - name: Build and push Docker image
       uses: docker/build-push-action@v5
