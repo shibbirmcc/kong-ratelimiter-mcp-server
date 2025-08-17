@@ -7,6 +7,6 @@ COPY src/ src/
 
 RUN pip install --no-cache-dir -e .
 
-EXPOSE 3000
+EXPOSE 8000
 
 CMD ["python", "-m", "kong_mcp_server.server"]

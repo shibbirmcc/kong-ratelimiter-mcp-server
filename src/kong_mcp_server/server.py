@@ -56,8 +56,8 @@ def main() -> None:
     # Set up tools before starting the server
     setup_tools()
 
-    # Run the server with SSE transport
-    mcp.run("sse", path="/messages/")
+    # Run the server with SSE transport on /sse/ endpoint
+    mcp.run("sse", path="/sse/")
 
 
 if __name__ == "__main__":
