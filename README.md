@@ -162,3 +162,123 @@ mypy src/
 black src/ tests/
 isort src/ tests/
 ```
+
+## Docker Deployment
+
+### Building the Docker Image
+
+```bash
+# Build the image
+docker build -t kong-mcp-server .
+
+# Or build with a specific tag
+docker build -t kong-mcp-server:0.1.2 .
+```
+
+### Running with Docker
+
+```bash
+# Run the container
+docker run -p 8000:8000 kong-mcp-server
+
+# Run in detached mode
+docker run -d -p 8000:8000 --name kong-mcp kong-mcp-server
+
+# Run with environment variables (if needed)
+docker run -p 8000:8000 -e KONG_ADMIN_URL=http://kong:8001 kong-mcp-server
+```
+
+### Docker Compose
+
+Create a `docker-compose.yml` file:
+
+```yaml
+version: '3.8'
+services:
+  kong-mcp-server:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - KONG_ADMIN_URL=http://kong:8001
+    restart: unless-stopped
+```
+
+Run with Docker Compose:
+
+```bash
+docker-compose up -d
+```
+
+## LLM Agent Configuration
+
+### Claude Code Integration
+
+To use this MCP server with Claude Code, add the server configuration to your MCP client:
+
+```json
+{
+  "mcpServers": {
+    "kong-rate-limiter": {
+      "command": "kong-mcp-server",
+      "args": [],
+      "env": {
+        "KONG_ADMIN_URL": "http://localhost:8001"
+      }
+    }
+  }
+}
+```
+
+### Server-Sent Events (SSE) Endpoint
+
+The server exposes an SSE endpoint for real-time communication:
+
+- **Endpoint**: `http://localhost:8000/sse/`
+- **Protocol**: Server-Sent Events (SSE)
+- **Content-Type**: `text/event-stream`
+
+### Configuration with Other MCP Clients
+
+For other MCP clients, configure the connection as follows:
+
+```yaml
+# Example configuration
+server:
+  name: "Kong Rate Limiter MCP Server"
+  transport: "sse"
+  url: "http://localhost:8000/sse/"
+  
+tools:
+  - hello_world
+  - kong_get_services
+  - kong_create_service
+  # ... other tools as enabled in tools_config.json
+```
+
+### Environment Variables
+
+Configure the server behavior using environment variables:
+
+```bash
+# Kong Admin API URL (default: http://localhost:8001)
+export KONG_ADMIN_URL=http://your-kong-instance:8001
+
+# Server port (default: 8000)
+export PORT=8000
+
+# Server host (default: 127.0.0.1)
+export HOST=0.0.0.0
+```
+
+### Custom Tool Configuration
+
+Enable/disable tools by modifying `tools_config.json`:
+
+```bash
+# Enable Kong services management
+# Set "enabled": true for kong_get_services, kong_create_service, etc.
+
+# Restart the server after configuration changes
+docker restart kong-mcp
+```
