@@ -1,6 +1,5 @@
 """Kong MCP Server main application."""
 
-import asyncio
 import importlib
 import json
 from pathlib import Path
@@ -52,16 +51,14 @@ def setup_tools() -> None:
             register_tool(tool_config)
 
 
-async def main() -> None:
+def main() -> None:
     """Main entry point for the MCP server."""
     # Set up tools before starting the server
     setup_tools()
 
-    from fastmcp.transports.sse import SseServerTransport  # type: ignore
-
-    async with SseServerTransport() as transport:
-        await mcp.run(transport)  # type: ignore
+    # Run the server with SSE transport
+    mcp.run("sse", path="/messages/")
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
