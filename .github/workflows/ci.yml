@@ -43,7 +43,14 @@ jobs:
       uses: codecov/codecov-action@v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: true
         slug: shibbirmcc/kong-ratelimiter-mcp-server
+        override_branch: ${{ github.head_ref || github.ref_name }}
+        override_commit: ${{ github.sha }}
+        override_pr: ${{ github.event.number }}
 
   docker:
     runs-on: ubuntu-latest
