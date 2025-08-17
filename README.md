@@ -142,8 +142,8 @@ pytest
 # Run with coverage
 pytest --cov=kong_mcp_server --cov-report=term-missing
 
-# Generate HTML coverage report
-pytest --cov=kong_mcp_server --cov-report=html
+# Generate text coverage report
+pytest --cov=kong_mcp_server --cov-report=txt
 ```
 
 ## Development

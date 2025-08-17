@@ -69,6 +69,6 @@ disallow_untyped_defs = true
 
 [tool.pytest.ini_options]
 minversion = "7.0"
-addopts = "-ra -q --strict-markers --cov=kong_mcp_server --cov-report=term-missing --cov-report=html"
+addopts = "-ra -q --strict-markers --cov=kong_mcp_server --cov-report=term-missing --cov-report=txt"
 testpaths = ["tests"]
 asyncio_mode = "auto"

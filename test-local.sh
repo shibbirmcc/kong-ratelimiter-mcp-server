@@ -92,8 +92,20 @@ fi
 
 # Step 4: Run tests
 print_step "Running tests"
-if pytest --cov=kong_mcp_server --cov-report=xml --cov-report=term-missing; then
+if pytest --cov=kong_mcp_server --cov-report=txt --cov-report=term-missing; then
     print_success "Tests passed"
+    
+    # Print coverage summary
+    echo ""
+    echo -e "${YELLOW}📊 Coverage Summary${NC}"
+    echo "------------------------"
+    if [ -f coverage.txt ]; then
+        # Extract overall coverage percentage
+        COVERAGE=$(grep -E "TOTAL.*[0-9]+%" coverage.txt | awk '{print $NF}')
+        echo -e "${GREEN}Overall Coverage: $COVERAGE${NC}"
+    else
+        echo -e "${RED}Coverage file not found${NC}"
+    fi
 else
     print_error "Tests failed"
     exit 1
