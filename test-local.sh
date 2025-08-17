@@ -92,8 +92,11 @@ fi
 
 # Step 4: Run tests
 print_step "Running tests"
-if pytest --cov=kong_mcp_server --cov-report=txt --cov-report=term-missing; then
+if pytest --cov=kong_mcp_server --cov-report=xml --cov-report=term-missing; then
     print_success "Tests passed"
+    
+    # Generate text coverage report
+    coverage report > coverage.txt
     
     # Print coverage summary
     echo ""

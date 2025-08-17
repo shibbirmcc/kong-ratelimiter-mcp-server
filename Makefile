@@ -41,7 +41,8 @@ type-check:
 
 # Run tests
 test:
-	pytest --cov=kong_mcp_server --cov-report=txt --cov-report=term-missing
+	pytest --cov=kong_mcp_server --cov-report=xml --cov-report=term-missing
+	coverage report > coverage.txt
 
 # Clean up build artifacts
 clean:
@@ -50,6 +51,7 @@ clean:
 	rm -rf *.egg-info/
 	rm -rf .coverage
 	rm -rf coverage.txt
+	rm -rf coverage.xml
 	rm -rf htmlcov/
 	find . -type d -name __pycache__ -exec rm -rf {} +
 	find . -type f -name "*.pyc" -delete
