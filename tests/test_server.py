@@ -40,9 +40,7 @@ def test_load_tools_config() -> None:
 
 @patch("builtins.open")
 @patch("kong_mcp_server.server.json.load")
-def test_load_tools_config_with_mock(
-    mock_json_load: Mock, mock_open: Mock
-) -> None:
+def test_load_tools_config_with_mock(mock_json_load: Mock, mock_open: Mock) -> None:
     """Test loading tools configuration using mocks."""
     test_config = {
         "tools": {
@@ -95,9 +93,7 @@ def test_register_tool_success(mock_import: Mock) -> None:
 
 @patch("kong_mcp_server.server.importlib.import_module")
 @patch("builtins.print")
-def test_register_tool_import_error(
-    mock_print: Mock, mock_import: Mock
-) -> None:
+def test_register_tool_import_error(mock_print: Mock, mock_import: Mock) -> None:
     """Test tool registration with import error."""
     mock_import.side_effect = ImportError("Module not found")
 
@@ -117,9 +113,7 @@ def test_register_tool_import_error(
 
 @patch("kong_mcp_server.server.importlib.import_module")
 @patch("builtins.print")
-def test_register_tool_attribute_error(
-    mock_print: Mock, mock_import: Mock
-) -> None:
+def test_register_tool_attribute_error(mock_print: Mock, mock_import: Mock) -> None:
     """Test tool registration with attribute error."""
     mock_module = Mock(spec=[])  # Empty spec means no attributes
     mock_import.return_value = mock_module
@@ -158,6 +152,4 @@ def test_setup_tools(mock_register: Mock, mock_load_config: Mock) -> None:
     setup_tools()
 
     mock_load_config.assert_called_once()
-    mock_register.assert_called_once_with(
-        {"name": "enabled_tool", "enabled": True}
-    )
+    mock_register.assert_called_once_with({"name": "enabled_tool", "enabled": True})
