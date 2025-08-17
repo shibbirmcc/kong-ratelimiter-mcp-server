@@ -17,7 +17,9 @@ async def test_get_services() -> None:
 
     assert isinstance(result, list)
     assert len(result) == 1
-    assert result[0]["message"] == "Kong services retrieval not yet implemented"
+    assert (
+        result[0]["message"] == "Kong services retrieval not yet implemented"
+    )
 
 
 @pytest.mark.asyncio

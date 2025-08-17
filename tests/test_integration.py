@@ -47,7 +47,10 @@ async def test_hello_world_tool_execution() -> None:
 async def test_kong_tools_placeholder_execution() -> None:
     """Test that Kong tools return placeholder responses."""
     from kong_mcp_server.tools.kong_routes import create_route, get_routes
-    from kong_mcp_server.tools.kong_services import create_service, get_services
+    from kong_mcp_server.tools.kong_services import (
+        create_service,
+        get_services,
+    )
 
     # Test services
     services_result = await get_services()

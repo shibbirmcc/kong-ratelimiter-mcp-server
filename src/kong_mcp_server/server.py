@@ -36,9 +36,9 @@ def register_tool(tool_config: Dict[str, Any]) -> None:
         tool_function = getattr(module, function_name)
 
         # Register the tool with MCP
-        mcp.tool(name=tool_config["name"], description=tool_config["description"])(
-            tool_function
-        )
+        mcp.tool(
+            name=tool_config["name"], description=tool_config["description"]
+        )(tool_function)
     except (ImportError, AttributeError) as e:
         print(f"Warning: Could not load tool {tool_config['name']}: {e}")
 
