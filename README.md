@@ -16,7 +16,7 @@ A Model Context Protocol (MCP) server for Kong configuration management, built w
 - **Modular Architecture**: Tools are organized in separate modules for easy extension
 - **JSON Configuration**: External JSON configuration for tool management
 - **Comprehensive Testing**: Unit and integration tests with high coverage
-- **Kong Tools**: Placeholder implementations for Kong services and routes management
+- **Kong HTTP Client**: HTTP client for Kong Admin API communication with authentication support
 - **Extensible Design**: Easy to add new Kong configuration tools
 
 ## Quick Start
@@ -113,12 +113,12 @@ Tools are configured in `tools_config.json`:
 ### Available Tools
 
 - **hello_world**: Basic test tool that returns a greeting message
-- **Kong Services**: CRUD operations for Kong services (placeholder)
+- **Kong Services**: CRUD operations for Kong services via HTTP API
   - `kong_get_services`: Retrieve services
   - `kong_create_service`: Create new service
   - `kong_update_service`: Update existing service
   - `kong_delete_service`: Delete service
-- **Kong Routes**: CRUD operations for Kong routes (placeholder)
+- **Kong Routes**: CRUD operations for Kong routes via HTTP API
   - `kong_get_routes`: Retrieve routes
   - `kong_create_route`: Create new route
   - `kong_update_route`: Update existing route
@@ -256,19 +256,131 @@ tools:
   # ... other tools as enabled in tools_config.json
 ```
 
-### Environment Variables
+## Kong Authentication Setup
+
+The server supports two authentication methods for Kong Admin API:
+
+### Kong Community Edition (Username/Password)
+
+```bash
+# Set Kong Admin credentials
+export KONG_ADMIN_URL=http://localhost:8001
+export KONG_USERNAME=admin
+export KONG_PASSWORD=your-password
+```
+
+### Kong Enterprise Edition (API Token)
+
+```bash
+# Set Kong Admin API token
+export KONG_ADMIN_URL=http://localhost:8001
+export KONG_API_TOKEN=your-api-token
+```
+
+### Additional Configuration Options
+
+```bash
+# Request timeout in seconds (default: 30.0)
+export KONG_TIMEOUT=45.0
+
+# SSL certificate verification (default: true)
+export KONG_VERIFY_SSL=false
+```
+
+## Environment Variables
 
 Configure the server behavior using environment variables:
+
+### Kong Configuration
 
 ```bash
 # Kong Admin API URL (default: http://localhost:8001)
 export KONG_ADMIN_URL=http://your-kong-instance:8001
 
+# Kong Community Edition authentication
+export KONG_USERNAME=admin
+export KONG_PASSWORD=your-password
+
+# Kong Enterprise Edition authentication (alternative to username/password)
+export KONG_API_TOKEN=your-api-token
+
+# Request timeout in seconds (default: 30.0)
+export KONG_TIMEOUT=45.0
+
+# SSL certificate verification (default: true)
+export KONG_VERIFY_SSL=false
+```
+
+### Server Configuration
+
+```bash
 # Server port (default: 8000)
 export PORT=8000
 
 # Server host (default: 127.0.0.1)
 export HOST=0.0.0.0
+```
+
+## Running with Different Configurations
+
+### Local Python with Environment Variables
+
+Create a `.env` file in the project root:
+
+```env
+KONG_ADMIN_URL=http://localhost:8001
+KONG_USERNAME=admin
+KONG_PASSWORD=secret
+KONG_TIMEOUT=30.0
+KONG_VERIFY_SSL=true
+```
+
+Then run:
+
+```bash
+# Load environment variables and run
+python -m kong_mcp_server.server
+```
+
+### Docker with Environment Variables
+
+```bash
+# Run with Kong Community Edition authentication
+docker run -p 8000:8000 \
+  -e KONG_ADMIN_URL=http://kong:8001 \
+  -e KONG_USERNAME=admin \
+  -e KONG_PASSWORD=secret \
+  kong-mcp-server
+
+# Run with Kong Enterprise Edition authentication
+docker run -p 8000:8000 \
+  -e KONG_ADMIN_URL=http://kong:8001 \
+  -e KONG_API_TOKEN=your-api-token \
+  kong-mcp-server
+```
+
+### Docker Compose with Environment File
+
+Create a `.env` file:
+
+```env
+KONG_ADMIN_URL=http://kong:8001
+KONG_USERNAME=admin
+KONG_PASSWORD=secret
+```
+
+Update `docker-compose.yml`:
+
+```yaml
+version: '3.8'
+services:
+  kong-mcp-server:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    restart: unless-stopped
 ```
 
 ### Custom Tool Configuration

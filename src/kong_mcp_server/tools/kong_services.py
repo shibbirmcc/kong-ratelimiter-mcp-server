@@ -2,6 +2,8 @@
 
 from typing import Any, Dict, List, Optional
 
+from kong_mcp_server.kong_client import KongClient
+
 
 async def get_services() -> List[Dict[str, Any]]:
     """Retrieve Kong services configuration.
@@ -9,8 +11,8 @@ async def get_services() -> List[Dict[str, Any]]:
     Returns:
         List of Kong services configuration data.
     """
-    # Placeholder implementation
-    return [{"message": "Kong services retrieval not yet implemented"}]
+    async with KongClient() as client:
+        return await client.get_services()
 
 
 async def create_service(
@@ -34,13 +36,21 @@ async def create_service(
     Returns:
         Created service configuration data.
     """
-    # Placeholder implementation
-    return {
-        "message": "Kong service creation not yet implemented",
+    service_data: Dict[str, Any] = {
         "name": name,
         "url": url,
         "protocol": protocol,
     }
+
+    if host is not None:
+        service_data["host"] = host
+    if port is not None:
+        service_data["port"] = port
+    if path is not None:
+        service_data["path"] = path
+
+    async with KongClient() as client:
+        return await client.create_service(service_data)
 
 
 async def update_service(
@@ -66,11 +76,23 @@ async def update_service(
     Returns:
         Updated service configuration data.
     """
-    # Placeholder implementation
-    return {
-        "message": "Kong service update not yet implemented",
-        "service_id": service_id,
-    }
+    service_data: Dict[str, Any] = {}
+
+    if name is not None:
+        service_data["name"] = name
+    if url is not None:
+        service_data["url"] = url
+    if protocol is not None:
+        service_data["protocol"] = protocol
+    if host is not None:
+        service_data["host"] = host
+    if port is not None:
+        service_data["port"] = port
+    if path is not None:
+        service_data["path"] = path
+
+    async with KongClient() as client:
+        return await client.update_service(service_id, service_data)
 
 
 async def delete_service(service_id: str) -> Dict[str, Any]:
@@ -82,8 +104,6 @@ async def delete_service(service_id: str) -> Dict[str, Any]:
     Returns:
         Deletion confirmation data.
     """
-    # Placeholder implementation
-    return {
-        "message": "Kong service deletion not yet implemented",
-        "service_id": service_id,
-    }
+    async with KongClient() as client:
+        await client.delete_service(service_id)
+        return {"message": "Service deleted successfully", "service_id": service_id}

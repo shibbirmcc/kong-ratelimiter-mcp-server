@@ -2,6 +2,8 @@
 
 from typing import Any, Dict, List, Optional
 
+from kong_mcp_server.kong_client import KongClient
+
 
 async def get_routes() -> List[Dict[str, Any]]:
     """Retrieve Kong routes configuration.
@@ -9,8 +11,8 @@ async def get_routes() -> List[Dict[str, Any]]:
     Returns:
         List of Kong routes configuration data.
     """
-    # Placeholder implementation
-    return [{"message": "Kong routes retrieval not yet implemented"}]
+    async with KongClient() as client:
+        return await client.get_routes()
 
 
 async def create_route(
@@ -34,12 +36,21 @@ async def create_route(
     Returns:
         Created route configuration data.
     """
-    # Placeholder implementation
-    return {
-        "message": "Kong route creation not yet implemented",
-        "service_id": service_id,
-        "name": name,
-    }
+    route_data: Dict[str, Any] = {"service": {"id": service_id}}
+
+    if name is not None:
+        route_data["name"] = name
+    if protocols is not None:
+        route_data["protocols"] = protocols
+    if methods is not None:
+        route_data["methods"] = methods
+    if hosts is not None:
+        route_data["hosts"] = hosts
+    if paths is not None:
+        route_data["paths"] = paths
+
+    async with KongClient() as client:
+        return await client.create_route(route_data)
 
 
 async def update_route(
@@ -65,11 +76,23 @@ async def update_route(
     Returns:
         Updated route configuration data.
     """
-    # Placeholder implementation
-    return {
-        "message": "Kong route update not yet implemented",
-        "route_id": route_id,
-    }
+    route_data: Dict[str, Any] = {}
+
+    if service_id is not None:
+        route_data["service"] = {"id": service_id}
+    if name is not None:
+        route_data["name"] = name
+    if protocols is not None:
+        route_data["protocols"] = protocols
+    if methods is not None:
+        route_data["methods"] = methods
+    if hosts is not None:
+        route_data["hosts"] = hosts
+    if paths is not None:
+        route_data["paths"] = paths
+
+    async with KongClient() as client:
+        return await client.update_route(route_id, route_data)
 
 
 async def delete_route(route_id: str) -> Dict[str, Any]:
@@ -81,8 +104,6 @@ async def delete_route(route_id: str) -> Dict[str, Any]:
     Returns:
         Deletion confirmation data.
     """
-    # Placeholder implementation
-    return {
-        "message": "Kong route deletion not yet implemented",
-        "route_id": route_id,
-    }
+    async with KongClient() as client:
+        await client.delete_route(route_id)
+        return {"message": "Route deleted successfully", "route_id": route_id}
