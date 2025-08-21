@@ -44,33 +44,51 @@ async def test_hello_world_tool_execution() -> None:
 
 
 @pytest.mark.asyncio
-async def test_kong_tools_placeholder_execution() -> None:
-    """Test that Kong tools return placeholder responses."""
+async def test_kong_tools_http_client_usage() -> None:
+    """Test that Kong tools use HTTP client for communication."""
+    from unittest.mock import AsyncMock, patch
+
     from kong_mcp_server.tools.kong_routes import create_route, get_routes
     from kong_mcp_server.tools.kong_services import (
         create_service,
         get_services,
     )
 
-    # Test services
-    services_result = await get_services()
-    assert isinstance(services_result, list)
-    assert len(services_result) == 1
-    assert "not yet implemented" in services_result[0]["message"]
+    # Mock Kong client responses
+    mock_services = [{"id": "1", "name": "test-service"}]
+    mock_routes = [{"id": "1", "name": "test-route"}]
+    mock_created_service = {
+        "id": "new-service",
+        "name": "test",
+        "url": "http://example.com",
+    }
+    mock_created_route = {"id": "new-route", "service": {"id": "service-123"}}
 
-    create_service_result = await create_service("test", "http://example.com")
-    assert isinstance(create_service_result, dict)
-    assert "not yet implemented" in create_service_result["message"]
+    # Test services
+    with patch("kong_mcp_server.tools.kong_services.KongClient") as mock_client_class:
+        mock_client = AsyncMock()
+        mock_client.get_services.return_value = mock_services
+        mock_client.create_service.return_value = mock_created_service
+        mock_client_class.return_value.__aenter__.return_value = mock_client
+
+        services_result = await get_services()
+        assert services_result == mock_services
+
+        create_service_result = await create_service("test", "http://example.com")
+        assert create_service_result == mock_created_service
 
     # Test routes
-    routes_result = await get_routes()
-    assert isinstance(routes_result, list)
-    assert len(routes_result) == 1
-    assert "not yet implemented" in routes_result[0]["message"]
+    with patch("kong_mcp_server.tools.kong_routes.KongClient") as mock_client_class:
+        mock_client = AsyncMock()
+        mock_client.get_routes.return_value = mock_routes
+        mock_client.create_route.return_value = mock_created_route
+        mock_client_class.return_value.__aenter__.return_value = mock_client
 
-    create_route_result = await create_route("service-123")
-    assert isinstance(create_route_result, dict)
-    assert "not yet implemented" in create_route_result["message"]
+        routes_result = await get_routes()
+        assert routes_result == mock_routes
+
+        create_route_result = await create_route("service-123")
+        assert create_route_result == mock_created_route
 
 
 def test_tools_config_structure() -> None:
