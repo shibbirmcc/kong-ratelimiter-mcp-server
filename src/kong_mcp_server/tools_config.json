@@ -1,67 +1,60 @@
 {
   "tools": {
-    "hello_world": {
-      "name": "hello_world",
-      "description": "Simple Hello World tool for testing MCP server functionality",
-      "module": "kong_mcp_server.tools.basic",
-      "function": "hello_world",
-      "enabled": true
-    },
     "kong_get_services": {
       "name": "kong_get_services",
       "description": "Retrieve Kong services configuration",
       "module": "kong_mcp_server.tools.kong_services",
       "function": "get_services",
-      "enabled": false
+      "enabled": true
     },
     "kong_create_service": {
       "name": "kong_create_service",
       "description": "Create a new Kong service",
       "module": "kong_mcp_server.tools.kong_services",
       "function": "create_service",
-      "enabled": false
+      "enabled": true
     },
     "kong_update_service": {
       "name": "kong_update_service",
       "description": "Update an existing Kong service",
       "module": "kong_mcp_server.tools.kong_services",
       "function": "update_service",
-      "enabled": false
+      "enabled": true
     },
     "kong_delete_service": {
       "name": "kong_delete_service",
       "description": "Delete a Kong service",
       "module": "kong_mcp_server.tools.kong_services",
       "function": "delete_service",
-      "enabled": false
+      "enabled": true
     },
     "kong_get_routes": {
       "name": "kong_get_routes",
       "description": "Retrieve Kong routes configuration",
       "module": "kong_mcp_server.tools.kong_routes",
       "function": "get_routes",
-      "enabled": false
+      "enabled": true
     },
     "kong_create_route": {
       "name": "kong_create_route",
       "description": "Create a new Kong route",
       "module": "kong_mcp_server.tools.kong_routes",
       "function": "create_route",
-      "enabled": false
+      "enabled": true
     },
     "kong_update_route": {
       "name": "kong_update_route",
       "description": "Update an existing Kong route",
       "module": "kong_mcp_server.tools.kong_routes",
       "function": "update_route",
-      "enabled": false
+      "enabled": true
     },
     "kong_delete_route": {
       "name": "kong_delete_route",
       "description": "Delete a Kong route",
       "module": "kong_mcp_server.tools.kong_routes",
       "function": "delete_route",
-      "enabled": false
+      "enabled": true
     }
   }
 }

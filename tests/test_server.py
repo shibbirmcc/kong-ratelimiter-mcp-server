@@ -29,13 +29,24 @@ def test_load_tools_config() -> None:
 
     assert "tools" in config
     assert isinstance(config["tools"], dict)
-    assert "hello_world" in config["tools"]
 
-    hello_world_config = config["tools"]["hello_world"]
-    assert hello_world_config["name"] == "hello_world"
-    assert hello_world_config["module"] == "kong_mcp_server.tools.basic"
-    assert hello_world_config["function"] == "hello_world"
-    assert hello_world_config["enabled"] is True
+    # Verify Kong tools are present and enabled
+    kong_tools = [
+        "kong_get_services",
+        "kong_create_service",
+        "kong_update_service",
+        "kong_delete_service",
+        "kong_get_routes",
+        "kong_create_route",
+        "kong_update_route",
+        "kong_delete_route",
+    ]
+
+    for tool_name in kong_tools:
+        assert tool_name in config["tools"]
+        tool_config = config["tools"][tool_name]
+        assert tool_config["name"] == tool_name
+        assert tool_config["enabled"] is True
 
 
 @patch("builtins.open")

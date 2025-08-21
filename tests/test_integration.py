@@ -19,9 +19,21 @@ async def test_server_tool_registration_integration() -> None:
         # Run setup_tools
         setup_tools()
 
-        # Check that hello_world tool is registered
+        # Check that Kong tools are registered
         if hasattr(mcp, "_tools"):
-            assert "hello_world" in mcp._tools
+            kong_tools = [
+                "kong_get_services",
+                "kong_create_service",
+                "kong_update_service",
+                "kong_delete_service",
+                "kong_get_routes",
+                "kong_create_route",
+                "kong_update_route",
+                "kong_delete_route",
+            ]
+            # At least some Kong tools should be registered
+            registered_kong_tools = [tool for tool in kong_tools if tool in mcp._tools]
+            assert len(registered_kong_tools) > 0
         else:
             # Alternative check if _tools attribute doesn't exist
             assert hasattr(mcp, "tool")
@@ -101,13 +113,7 @@ def test_tools_config_structure() -> None:
     assert "tools" in config
     assert isinstance(config["tools"], dict)
 
-    # Verify hello_world tool configuration
-    hello_world_config = config["tools"]["hello_world"]
-    assert hello_world_config["enabled"] is True
-    assert hello_world_config["module"] == "kong_mcp_server.tools.basic"
-    assert hello_world_config["function"] == "hello_world"
-
-    # Verify Kong tools are present but disabled
+    # Verify Kong tools are present and enabled
     kong_tools = [
         "kong_get_services",
         "kong_create_service",
@@ -121,7 +127,7 @@ def test_tools_config_structure() -> None:
 
     for tool_name in kong_tools:
         assert tool_name in config["tools"]
-        assert config["tools"][tool_name]["enabled"] is False
+        assert config["tools"][tool_name]["enabled"] is True
 
 
 def test_mcp_server_configuration() -> None:
