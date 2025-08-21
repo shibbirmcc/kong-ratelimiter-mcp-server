@@ -11,7 +11,7 @@ PID_FILE="/tmp/kong_mcp_server.pid"
 LOG_FILE="/tmp/kong_mcp_server.log"
 SERVER_MODULE="kong_mcp_server.server"
 DEFAULT_HOST="127.0.0.1"
-DEFAULT_PORT="8000"
+DEFAULT_PORT="8080"
 
 # Colors for output
 RED='\033[0;31m'
