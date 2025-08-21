@@ -432,3 +432,23 @@ Enable/disable tools by modifying `tools_config.json`:
 # Restart the server after configuration changes
 docker restart kong-mcp
 ```
+
+## Testing with MCP Inspector
+
+After starting the MCP server, you can use the MCP Inspector to test the available tools interactively:
+
+```bash
+# Start the MCP server first
+python -m kong_mcp_server.server
+
+# In a new terminal, install and run MCP Inspector
+npx @modelcontextprotocol/inspector http://localhost:8080/sse/
+```
+
+The MCP Inspector provides a web-based interface where you can:
+- View all available tools and their descriptions
+- Test tool functionality with custom parameters
+- Examine tool schemas and input/output formats
+- Debug MCP communication and server responses
+
+This is particularly useful for validating that your Kong API tools are working correctly before integrating with LLM clients like Claude Code.
