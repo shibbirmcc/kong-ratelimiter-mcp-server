@@ -179,13 +179,13 @@ docker build -t kong-mcp-server:0.1.2 .
 
 ```bash
 # Run the container
-docker run -p 8000:8000 kong-mcp-server
+docker run -p 8080:8080 kong-mcp-server
 
 # Run in detached mode
-docker run -d -p 8000:8000 --name kong-mcp kong-mcp-server
+docker run -d -p 8080:8080 --name kong-mcp kong-mcp-server
 
 # Run with environment variables (if needed)
-docker run -p 8000:8000 -e KONG_ADMIN_URL=http://kong:8001 kong-mcp-server
+docker run -p 8080:8080 -e KONG_ADMIN_URL=http://kong:8001 kong-mcp-server
 ```
 
 ### Docker Compose
@@ -198,7 +198,7 @@ services:
   kong-mcp-server:
     build: .
     ports:
-      - "8000:8000"
+      - "8080:8080"
     environment:
       - KONG_ADMIN_URL=http://kong:8001
     restart: unless-stopped
@@ -234,7 +234,7 @@ To use this MCP server with Claude Code, add the server configuration to your MC
 
 The server exposes an SSE endpoint for real-time communication:
 
-- **Endpoint**: `http://localhost:8000/sse/`
+- **Endpoint**: `http://localhost:8080/sse/`
 - **Protocol**: Server-Sent Events (SSE)
 - **Content-Type**: `text/event-stream`
 
@@ -247,7 +247,7 @@ For other MCP clients, configure the connection as follows:
 server:
   name: "Kong Rate Limiter MCP Server"
   transport: "sse"
-  url: "http://localhost:8000/sse/"
+  url: "http://localhost:8080/sse/"
   
 tools:
   - hello_world
@@ -314,11 +314,49 @@ export KONG_VERIFY_SSL=false
 ### Server Configuration
 
 ```bash
-# Server port (default: 8000)
-export PORT=8000
+# Server port (default: 8080)
+export FASTMCP_PORT=8080
 
 # Server host (default: 127.0.0.1)
 export HOST=0.0.0.0
+```
+
+### Changing the Default Port
+
+The server uses port 8080 by default. You can change this in several ways:
+
+#### Method 1: Environment Variable
+```bash
+# Set custom port
+export FASTMCP_PORT=3000
+python -m kong_mcp_server.server
+```
+
+#### Method 2: Docker Run
+```bash
+# Map to a different host port (container still uses 8080)
+docker run -p 3000:8080 kong-mcp-server
+
+# Or change both host and container port
+docker run -p 3000:3000 -e FASTMCP_PORT=3000 kong-mcp-server
+```
+
+#### Method 3: Docker Compose
+```yaml
+version: '3.8'
+services:
+  kong-mcp-server:
+    build: .
+    ports:
+      - "3000:8080"  # Host port 3000, container port 8080
+    environment:
+      - FASTMCP_PORT=8080    # Keep container port as 8080
+```
+
+#### Method 4: Server Management Script
+```bash
+# Set port via environment variable
+FASTMCP_PORT=3000 ./scripts/server.sh start
 ```
 
 ## Running with Different Configurations
@@ -346,14 +384,14 @@ python -m kong_mcp_server.server
 
 ```bash
 # Run with Kong Community Edition authentication
-docker run -p 8000:8000 \
+docker run -p 8080:8080 \
   -e KONG_ADMIN_URL=http://kong:8001 \
   -e KONG_USERNAME=admin \
   -e KONG_PASSWORD=secret \
   kong-mcp-server
 
 # Run with Kong Enterprise Edition authentication
-docker run -p 8000:8000 \
+docker run -p 8080:8080 \
   -e KONG_ADMIN_URL=http://kong:8001 \
   -e KONG_API_TOKEN=your-api-token \
   kong-mcp-server
@@ -377,7 +415,7 @@ services:
   kong-mcp-server:
     build: .
     ports:
-      - "8000:8000"
+      - "8080:8080"
     env_file:
       - .env
     restart: unless-stopped
@@ -394,3 +432,23 @@ Enable/disable tools by modifying `tools_config.json`:
 # Restart the server after configuration changes
 docker restart kong-mcp
 ```
+
+## Testing with MCP Inspector
+
+After starting the MCP server, you can use the MCP Inspector to test the available tools interactively:
+
+```bash
+# Start the MCP server first
+python -m kong_mcp_server.server
+
+# In a new terminal, install and run MCP Inspector
+npx @modelcontextprotocol/inspector http://localhost:8080/sse/
+```
+
+The MCP Inspector provides a web-based interface where you can:
+- View all available tools and their descriptions
+- Test tool functionality with custom parameters
+- Examine tool schemas and input/output formats
+- Debug MCP communication and server responses
+
+This is particularly useful for validating that your Kong API tools are working correctly before integrating with LLM clients like Claude Code.
