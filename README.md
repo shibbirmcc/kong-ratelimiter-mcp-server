@@ -40,7 +40,32 @@ pytest --cov=kong_mcp_server
 ./venv.sh deactivate
 ```
 
-### Option 2: Manual Setup
+### Option 2: Using the Server Management Script
+
+```bash
+# Start the server (automatically creates logs directory and manages PID)
+./scripts/server.sh start
+
+# Check server status
+./scripts/server.sh status
+
+# Perform health check
+./scripts/server.sh health
+
+# View logs
+./scripts/server.sh logs
+
+# Follow logs in real-time
+./scripts/server.sh follow
+
+# Stop the server
+./scripts/server.sh stop
+
+# Restart the server
+./scripts/server.sh restart
+```
+
+### Option 3: Manual Setup
 
 ```bash
 # Create and activate virtual environment
@@ -67,6 +92,83 @@ pytest --cov=kong_mcp_server
 ./venv.sh activate  # Same as above
 ./venv.sh deactivate # Deactivate current virtual environment
 ./venv.sh clean     # Remove virtual environment directory
+```
+
+## Server Management Script
+
+The project includes a comprehensive server management script at `scripts/server.sh` that provides:
+
+### Features
+
+- **PID Management**: Tracks server process ID in `logs/kong_mcp_server.pid`
+- **Log Management**: Redirects server output to `logs/kong_mcp_server.log`
+- **Health Checks**: Performs both process and endpoint health checks
+- **Automatic Cleanup**: Handles graceful shutdown and process cleanup
+- **Status Monitoring**: Shows detailed server status and recent logs
+
+### Commands
+
+```bash
+# Server lifecycle management
+./scripts/server.sh start     # Start the server
+./scripts/server.sh stop      # Stop the server
+./scripts/server.sh restart   # Restart the server
+
+# Monitoring and diagnostics
+./scripts/server.sh status    # Show server status and recent logs
+./scripts/server.sh health    # Perform comprehensive health check
+./scripts/server.sh logs      # Display all server logs
+./scripts/server.sh follow    # Follow logs in real-time
+
+# Help and configuration
+./scripts/server.sh help      # Show all available commands
+```
+
+### Health Check Features
+
+The health check performs multiple validations:
+
+1. **Process Check**: Verifies the server process is running
+2. **Endpoint Check**: Tests HTTP connectivity to the SSE endpoint
+3. **Response Validation**: Ensures the server responds correctly
+
+```bash
+# Example health check output
+./scripts/server.sh health
+# [INFO] Performing health check...
+# [INFO] Server process is running (PID: 12345)
+# [INFO] Checking server endpoint: http://127.0.0.1:8080/sse/
+# [SUCCESS] Health check passed: Server is responding
+```
+
+### Log Management
+
+Logs are stored in the `logs/` directory:
+
+- **logs/kong_mcp_server.log**: Server output and error logs
+- **logs/kong_mcp_server.pid**: Current server process ID
+
+```bash
+# View recent logs
+./scripts/server.sh status
+
+# View all logs
+./scripts/server.sh logs
+
+# Follow logs in real-time
+./scripts/server.sh follow
+```
+
+### Environment Variable Support
+
+The script respects environment variables for configuration:
+
+```bash
+# Custom host and port
+HOST=0.0.0.0 PORT=3000 ./scripts/server.sh start
+
+# Kong configuration
+KONG_ADMIN_URL=http://kong:8001 ./scripts/server.sh start
 ```
 
 ## Architecture
