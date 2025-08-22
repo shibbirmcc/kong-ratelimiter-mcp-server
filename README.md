@@ -49,6 +49,19 @@ export KONG_TIMEOUT=30.0                     # Request timeout (seconds)
 export KONG_VERIFY_SSL=true                  # SSL verification
 ```
 
+### Kong Authentication
+
+**Community Edition (Username/Password):**
+```bash
+export KONG_USERNAME=admin
+export KONG_PASSWORD=your-password
+```
+
+**Enterprise Edition (API Token):**
+```bash
+export KONG_API_TOKEN=your-api-token
+```
+
 ### Port Configuration Examples
 ```bash
 # Use default port 8080 (no environment variable needed)
@@ -73,18 +86,46 @@ Tools are configured in `tools_config.json`. Set `"enabled": true` to activate:
 - **Kong Routes**: CRUD operations for Kong routes  
   - `kong_get_routes`, `kong_create_route`, `kong_update_route`, `kong_delete_route`
 
+### Adding New Tools
+
+1. Create module in `src/kong_mcp_server/tools/`
+2. Implement tool functions
+3. Add configuration to `tools_config.json`
+4. Set `"enabled": true`
+
+### Architecture
+
+```
+src/kong_mcp_server/
+├── server.py                # Main MCP server
+├── tools_config.json        # Tool configuration
+├── kong_client.py          # Kong HTTP client
+└── tools/                  # Tool modules
+    ├── basic.py
+    ├── kong_services.py
+    └── kong_routes.py
+```
+
 ## Development
 
+### Code Quality
 ```bash
-# Code Quality
 flake8 src/ tests/
 mypy src/
 black src/ tests/
 isort src/ tests/
+```
 
-# Testing
+### Testing
+```bash
 pytest                                       # Run tests
 pytest --cov=kong_mcp_server --cov-report=term-missing
+pytest --cov=kong_mcp_server --cov-report=xml           # Generate XML report
+```
+
+### Integration Testing
+```bash
+RUN_LIVE_TESTS=true pytest tests/test_kong_integration.py  # Requires testcontainers
 ```
 
 ## Docker
