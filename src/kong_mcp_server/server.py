@@ -2,6 +2,7 @@
 
 import importlib
 import json
+import os
 from pathlib import Path
 from typing import Any, Dict
 
@@ -56,8 +57,11 @@ def main() -> None:
     # Set up tools before starting the server
     setup_tools()
 
+    # Get port from environment variable with fallback to 8080
+    port = int(os.environ.get("FASTMCP_PORT", "8080"))
+
     # Run the server with SSE transport on /sse/ endpoint
-    mcp.run("sse", path="/sse/")
+    mcp.run("sse", path="/sse/", port=port)
 
 
 if __name__ == "__main__":
