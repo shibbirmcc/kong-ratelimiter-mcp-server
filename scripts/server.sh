@@ -104,7 +104,8 @@ start_server() {
     if is_running; then
         print_success "Server started successfully (PID: $server_pid)"
         print_status "Server logs: $LOG_FILE"
-        print_status "Default endpoint: http://${DEFAULT_HOST}:${DEFAULT_PORT}/sse/"
+        local display_port=${FASTMCP_PORT:-$DEFAULT_PORT}
+        print_status "Server endpoint: http://${DEFAULT_HOST}:${display_port}/sse/"
     else
         print_error "Failed to start server"
         if [ -f "$LOG_FILE" ]; then
@@ -177,7 +178,7 @@ health_check() {
     
     # Check if the server is responding on the expected port
     local host=${HOST:-$DEFAULT_HOST}
-    local port=${PORT:-$DEFAULT_PORT}
+    local port=${FASTMCP_PORT:-$DEFAULT_PORT}
     
     print_status "Checking server endpoint: http://$host:$port/sse/"
     
@@ -275,7 +276,7 @@ show_help() {
     echo
     echo "Environment Variables:"
     echo "  HOST     - Server host (default: $DEFAULT_HOST)"
-    echo "  PORT     - Server port (default: $DEFAULT_PORT)"
+    echo "  FASTMCP_PORT - Server port (default: $DEFAULT_PORT)"
     echo
     echo "Examples:"
     echo "  $0 start         # Start the server"
