@@ -78,7 +78,7 @@ async def test_sse_request_default() -> None:
 
 @pytest.mark.asyncio
 async def test_sse_request_tool_call() -> None:
-    """Test /sse/request endpoint with tool call."""
+    """Test /sse/request endpoint with non-existent tool call."""
     request = Mock(spec=Request)
 
     async def mock_json() -> dict[str, str | int | dict[str, str]]:
@@ -99,8 +99,9 @@ async def test_sse_request_tool_call() -> None:
     body = json.loads(response.body)
     assert body["jsonrpc"] == "2.0"
     assert body["id"] == 1
-    assert "content" in body["result"]
-    assert len(body["result"]["content"]) > 0
+    assert "error" in body
+    assert body["error"]["code"] == -32601
+    assert "Tool not found" in body["error"]["message"]
 
 
 @pytest.mark.asyncio
