@@ -11,7 +11,7 @@ from kong_mcp_server.server import api_discovery, apis_discovery, sse_ping, sse_
 
 
 @pytest.mark.asyncio
-async def test_api_discovery():
+async def test_api_discovery() -> None:
     """Test /api discovery endpoint."""
     request = Mock(spec=Request)
     response = await api_discovery(request)
@@ -29,7 +29,7 @@ async def test_api_discovery():
 
 
 @pytest.mark.asyncio
-async def test_apis_discovery():
+async def test_apis_discovery() -> None:
     """Test /apis alternative discovery endpoint."""
     request = Mock(spec=Request)
     response = await apis_discovery(request)
@@ -40,7 +40,7 @@ async def test_apis_discovery():
 
 
 @pytest.mark.asyncio
-async def test_sse_ping():
+async def test_sse_ping() -> None:
     """Test /sse/ping endpoint."""
     request = Mock(spec=Request)
     response = await sse_ping(request)
@@ -56,11 +56,11 @@ async def test_sse_ping():
 
 
 @pytest.mark.asyncio
-async def test_sse_request_default():
+async def test_sse_request_default() -> None:
     """Test /sse/request endpoint with default request."""
     request = Mock(spec=Request)
 
-    async def mock_json():
+    async def mock_json() -> dict[str, str | int]:
         return {"jsonrpc": "2.0", "method": "test_method", "id": 1}
 
     request.json = mock_json
@@ -77,11 +77,11 @@ async def test_sse_request_default():
 
 
 @pytest.mark.asyncio
-async def test_sse_request_tool_call():
+async def test_sse_request_tool_call() -> None:
     """Test /sse/request endpoint with tool call."""
     request = Mock(spec=Request)
 
-    async def mock_json():
+    async def mock_json() -> dict[str, str | int | dict[str, str]]:
         return {
             "jsonrpc": "2.0",
             "method": "tools/call",
@@ -104,7 +104,7 @@ async def test_sse_request_tool_call():
 
 
 @pytest.mark.asyncio
-async def test_sse_request_error_handling():
+async def test_sse_request_error_handling() -> None:
     """Test /sse/request endpoint error handling."""
     request = Mock(spec=Request)
     request.json = Mock(side_effect=Exception("Invalid JSON"))

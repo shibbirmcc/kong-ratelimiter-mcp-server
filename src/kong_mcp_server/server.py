@@ -9,7 +9,7 @@ from typing import Any, Dict
 
 from fastmcp import FastMCP
 from starlette.requests import Request
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, Response
 
 mcp = FastMCP("Kong Rate Limiter MCP Server")
 
@@ -39,7 +39,7 @@ async def api_discovery(request: Request) -> JSONResponse:
 
 
 @mcp.custom_route("/apis", methods=["GET"])
-async def apis_discovery(request: Request) -> JSONResponse:
+async def apis_discovery(request: Request) -> Response:
     """Alternative API discovery endpoint for compatibility."""
     return await api_discovery(request)
 
