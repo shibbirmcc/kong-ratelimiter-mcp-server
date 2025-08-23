@@ -479,13 +479,56 @@ docker restart kong-mcp
 
 ## Testing with MCP Inspector
 
+### Installation
+
 ```bash
-# Start server
+# Install MCP Inspector globally
+npm install -g @modelcontextprotocol/inspector
+```
+
+### Testing the Server
+
+```bash
+# Start the Kong MCP server
 python -m kong_mcp_server.server
 
-# In new terminal, run inspector
-npx @modelcontextprotocol/inspector http://localhost:8080/sse/
+# In a new terminal, test with MCP Inspector using SSE transport
+mcp-inspector --transport sse --server-url http://localhost:8080/sse
+
+# Alternative: Test with HTTP transport (for JSON-RPC requests)
+mcp-inspector --transport http --server-url http://localhost:8080/sse/request
 ```
+
+### Manual Testing with cURL
+
+You can also test the server endpoints manually:
+
+```bash
+# Test API discovery
+curl -X GET http://localhost:8080/api
+
+# Test tools/list endpoint
+curl -X POST http://localhost:8080/sse/request \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc": "2.0", "id": "test", "method": "tools/list"}'
+
+# Test tool execution (example: get Kong routes)
+curl -X POST http://localhost:8080/sse/request \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc": "2.0", "id": "test", "method": "tools/call", "params": {"name": "kong_get_routes", "arguments": {}}}'
+```
+
+### Web Interface
+
+The MCP Inspector provides a web interface for interactive testing:
+
+1. Run `mcp-inspector --transport sse --server-url http://localhost:8080/sse`
+2. Open the browser URL displayed in the terminal
+3. Use the web interface to:
+   - View all available tools
+   - Inspect tool schemas
+   - Execute tools with custom parameters
+   - Debug responses in real-time
 
 ## License
 
