@@ -18,22 +18,24 @@ mcp = FastMCP("Kong Rate Limiter MCP Server")
 @mcp.custom_route("/api", methods=["GET"])
 async def api_discovery(request: Request) -> JSONResponse:
     """Standard MCP API discovery endpoint."""
-    return JSONResponse({
-        "name": "Kong Rate Limiter MCP Server",
-        "version": "0.1.2",
-        "protocol_version": "2025-06-18",
-        "capabilities": {
-            "tools": True,
-            "resources": False,
-            "prompts": False,
-            "sampling": False
-        },
-        "endpoints": {
-            "sse": "/sse/",
-            "ping": "/sse/ping",
-            "request": "/sse/request"
+    return JSONResponse(
+        {
+            "name": "Kong Rate Limiter MCP Server",
+            "version": "0.1.2",
+            "protocol_version": "2025-06-18",
+            "capabilities": {
+                "tools": True,
+                "resources": False,
+                "prompts": False,
+                "sampling": False,
+            },
+            "endpoints": {
+                "sse": "/sse/",
+                "ping": "/sse/ping",
+                "request": "/sse/request",
+            },
         }
-    })
+    )
 
 
 @mcp.custom_route("/apis", methods=["GET"])
@@ -45,14 +47,13 @@ async def apis_discovery(request: Request) -> JSONResponse:
 @mcp.custom_route("/sse/ping", methods=["GET", "POST"])
 async def sse_ping(request: Request) -> JSONResponse:
     """SSE ping endpoint for health checks."""
-    return JSONResponse({
-        "jsonrpc": "2.0",
-        "method": "ping",
-        "result": {
-            "status": "ok",
-            "timestamp": time.time()
+    return JSONResponse(
+        {
+            "jsonrpc": "2.0",
+            "method": "ping",
+            "result": {"status": "ok", "timestamp": time.time()},
         }
-    })
+    )
 
 
 @mcp.custom_route("/sse/request", methods=["POST"])
@@ -60,37 +61,39 @@ async def sse_request(request: Request) -> JSONResponse:
     """SSE request endpoint for MCP JSON-RPC messages."""
     try:
         body = await request.json()
-        
+
         # Handle tool calls
         if body.get("method") == "tools/call":
             tool_name = body.get("params", {}).get("name")
             if tool_name:
-                return JSONResponse({
-                    "jsonrpc": "2.0",
-                    "id": body.get("id"),
-                    "result": {
-                        "content": [
-                            {"type": "text", "text": f"Tool {tool_name} executed via SSE request"}
-                        ]
+                return JSONResponse(
+                    {
+                        "jsonrpc": "2.0",
+                        "id": body.get("id"),
+                        "result": {
+                            "content": [
+                                {
+                                    "type": "text",
+                                    "text": f"Tool {tool_name} executed via SSE request",  # noqa: E501
+                                }
+                            ]
+                        },
                     }
-                })
-        
+                )
+
         # Default response for other requests
-        return JSONResponse({
-            "jsonrpc": "2.0",
-            "id": body.get("id"),
-            "result": {"status": "received"}
-        })
-        
+        return JSONResponse(
+            {"jsonrpc": "2.0", "id": body.get("id"), "result": {"status": "received"}}
+        )
+
     except Exception as e:
-        return JSONResponse({
-            "jsonrpc": "2.0",
-            "error": {
-                "code": -32603,
-                "message": "Internal error",
-                "data": str(e)
-            }
-        }, status_code=500)
+        return JSONResponse(
+            {
+                "jsonrpc": "2.0",
+                "error": {"code": -32603, "message": "Internal error", "data": str(e)},
+            },
+            status_code=500,
+        )
 
 
 def load_tools_config() -> Dict[str, Any]:
