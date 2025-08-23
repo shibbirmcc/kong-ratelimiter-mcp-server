@@ -61,35 +61,116 @@ async def sse_request(request: Request) -> JSONResponse:
     """SSE request endpoint for MCP JSON-RPC messages."""
     try:
         body = await request.json()
+        method = body.get("method")
+        request_id = body.get("id")
 
-        # Handle tool calls
-        if body.get("method") == "tools/call":
+        # Handle tools/list method
+        if method == "tools/list":
+            # Get all registered tools from the MCP instance
+            tools_list = []
+            config = load_tools_config()
+            
+            for tool_name, tool_config in config["tools"].items():
+                if tool_config.get("enabled", False):
+                    tools_list.append({
+                        "name": tool_config["name"],
+                        "description": tool_config["description"],
+                        "inputSchema": {
+                            "type": "object",
+                            "properties": {},
+                            "additionalProperties": True
+                        }
+                    })
+            
+            return JSONResponse({
+                "jsonrpc": "2.0",
+                "id": request_id,
+                "result": {
+                    "tools": tools_list
+                }
+            })
+
+        # Handle tool calls - delegate to actual FastMCP tool execution
+        elif method == "tools/call":
             tool_name = body.get("params", {}).get("name")
+            arguments = body.get("params", {}).get("arguments", {})
+            
             if tool_name:
-                return JSONResponse(
-                    {
-                        "jsonrpc": "2.0",
-                        "id": body.get("id"),
-                        "result": {
-                            "content": [
-                                {
-                                    "type": "text",
-                                    "text": f"Tool {tool_name} executed via SSE request",  # noqa: E501
-                                }
-                            ]
-                        },
+                # Check if tool exists in our registry
+                config = load_tools_config()
+                if tool_name in [t["name"] for t in config["tools"].values() if t.get("enabled")]:
+                    try:
+                        # Import and execute the tool function directly
+                        tool_config = next(
+                            (t for t in config["tools"].values() 
+                             if t["name"] == tool_name and t.get("enabled")), 
+                            None
+                        )
+                        
+                        if tool_config:
+                            module = importlib.import_module(tool_config["module"])
+                            tool_function = getattr(module, tool_config["function"])
+                            
+                            # Execute the tool function
+                            if hasattr(tool_function, '__call__'):
+                                import inspect
+                                if inspect.iscoroutinefunction(tool_function):
+                                    result = await tool_function(**arguments)
+                                else:
+                                    result = tool_function(**arguments)
+                                
+                                return JSONResponse({
+                                    "jsonrpc": "2.0",
+                                    "id": request_id,
+                                    "result": {
+                                        "content": [
+                                            {
+                                                "type": "text",
+                                                "text": f"Tool {tool_name} executed successfully"
+                                            }
+                                        ],
+                                        "data": result,
+                                        "isError": False
+                                    }
+                                })
+                        
+                    except Exception as e:
+                        return JSONResponse({
+                            "jsonrpc": "2.0",
+                            "id": request_id,
+                            "result": {
+                                "content": [
+                                    {
+                                        "type": "text",
+                                        "text": f"Tool {tool_name} failed: {str(e)}"
+                                    }
+                                ],
+                                "isError": True
+                            }
+                        })
+                
+                # Tool not found
+                return JSONResponse({
+                    "jsonrpc": "2.0",
+                    "id": request_id,
+                    "error": {
+                        "code": -32601,
+                        "message": f"Tool not found: {tool_name}"
                     }
-                )
+                })
 
-        # Default response for other requests
-        return JSONResponse(
-            {"jsonrpc": "2.0", "id": body.get("id"), "result": {"status": "received"}}
-        )
+        # Handle other methods
+        return JSONResponse({
+            "jsonrpc": "2.0",
+            "id": request_id,
+            "result": {"status": "received", "method": method}
+        })
 
     except Exception as e:
         return JSONResponse(
             {
                 "jsonrpc": "2.0",
+                "id": body.get("id") if 'body' in locals() else None,
                 "error": {"code": -32603, "message": "Internal error", "data": str(e)},
             },
             status_code=500,
