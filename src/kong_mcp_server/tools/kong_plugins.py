@@ -1,6 +1,6 @@
 """Kong plugins management tools."""
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
 from kong_mcp_server.kong_client import KongClient
 
