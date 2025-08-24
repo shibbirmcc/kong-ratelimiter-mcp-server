@@ -164,7 +164,11 @@ docker run -p 9000:9000 -e FASTMCP_PORT=9000 kong-mcp-server
   - `kong_create_route`: Create new route
   - `kong_update_route`: Update existing route
   - `kong_delete_route`: Delete route
-
+- **Kong Plugins**: Management and retrieval of Kong plugins with filtering and scoping support  
+  - `kong_get_plugins`: Retrieve all plugins with optional filtering and pagination  
+  - `kong_get_plugins_by_service`: Retrieve plugins scoped to a specific service  
+  - `kong_get_plugins_by_route`: Retrieve plugins scoped to a specific route  
+  - `kong_get_plugins_by_consumer`: Retrieve plugins scoped to a specific consumer  
 ### Adding New Tools
 
 1. Create a new module in `src/kong_mcp_server/tools/`

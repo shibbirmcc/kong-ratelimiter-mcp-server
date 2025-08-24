@@ -55,6 +55,34 @@
       "module": "kong_mcp_server.tools.kong_routes",
       "function": "delete_route",
       "enabled": true
+    },
+    "kong_get_plugins": {
+      "name": "kong_get_plugins",
+      "description": "Retrieve global Kong plugins with optional filtering by name and pagination.",
+      "module": "kong_mcp_server.tools.kong_plugins",
+      "function": "get_plugins",
+      "enabled": true
+    },
+    "kong_get_plugins_by_service": {
+      "name": "kong_get_plugins_by_service",
+      "description": "Retrieve service scoped Kong plugins with optional filtering by name and pagination.",
+      "module": "kong_mcp_server.tools.kong_plugins",
+      "function": "get_plugins_by_service",
+      "enabled": true
+    },
+      "kong_get_plugins_by_route": {
+      "name": "kong_get_plugins_by_route",
+      "description": "Retrieve route scoped Kong plugins with optional filtering by name and pagination.",
+      "module": "kong_mcp_server.tools.kong_plugins",
+      "function": "get_plugins_by_route",
+      "enabled": true
+    },
+      "kong_get_plugins_by_consumer": {
+      "name": "kong_get_plugins_by_consumer",
+      "description": "Retrieve consumer scoped Kong plugins with optional filtering by name and pagination.",
+      "module": "kong_mcp_server.tools.kong_plugins",
+      "function": "get_plugins_by_consumer",
+      "enabled": true
     }
   }
 }

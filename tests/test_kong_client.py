@@ -481,7 +481,7 @@ class TestKongClient:
         mock_response = {"data": [{"id": "1", "name": "rate-limiting"}]}
 
         with patch.object(client, "get", return_value=mock_response) as mock_get:
-            result = await client.get_plugins()
+            result = await client.get_plugins_as_list()
 
             assert result == [{"id": "1", "name": "rate-limiting"}]
             mock_get.assert_called_once_with("/plugins", params={})

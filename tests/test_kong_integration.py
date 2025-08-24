@@ -57,14 +57,51 @@ class TestKongClientIntegration:
             "plugins": {
                 "data": [
                     {
-                        "id": "plugin-1",
-                        "name": "rate-limiting",
-                        "config": {"minute": 100, "hour": 1000},
-                        "service": {"id": "service-1"},
+                        "id": "plugin-global-1",
+                        "name": "cors",
+                        "config": {},
                         "created_at": 1618846400,
                     }
-                ]
+                ],
+                "offset": None,
             },
+            "plugins_by_service": {
+                "data": [
+                    {
+                        "id": "plugin-service-1",
+                        "name": "rate-limiting",
+                        "service": {"id": "service-1"},
+                        "config": {"minute": 100},
+                        "created_at": 1618846400,
+                    }
+                ],
+                "offset": None,
+            },
+            "plugins_by_route": {
+                "data": [
+                    {
+                        "id": "plugin-route-1",
+                        "name": "jwt",
+                        "route": {"id": "route-1"},
+                        "config": {"key": "value"},
+                        "created_at": 1618846400,
+                    }
+                ],
+                "offset": None,
+            },
+            "plugins_by_consumer": {
+                "data": [
+                    {
+                        "id": "plugin-consumer-1",
+                        "name": "key-auth",
+                        "consumer": {"id": "consumer-1"},
+                        "config": {},
+                        "created_at": 1618846400,
+                    }
+                ],
+                "offset": None,
+            },
+            "consumers": {"data": [{"id": "consumer-1", "username": "test-consumer"}]},
             "status": {
                 "database": {"reachable": True},
                 "server": {"connections_accepted": 100},
@@ -212,6 +249,93 @@ class TestKongClientIntegration:
                 assert len(routes) == 1
                 assert routes[0]["name"] == "test-route"
                 mock_request.assert_called_with("GET", "/routes", params={"size": 10})
+
+    @pytest.mark.asyncio
+    async def test_kong_client_plugins_operations_integration(
+        self, mock_kong_responses: Dict[str, Any]
+    ) -> None:
+        config = KongClientConfig(base_url="http://kong-admin:8001")
+        async with KongClient(config) as client:
+            with patch.object(client, "_request") as mock_request:
+                mock_response = mock_kong_responses["plugins"]
+                mock_request.return_value = mock_response
+
+                result = await client.get_plugins(params={"name": "jwt", "size": 10})
+
+                assert result["data"] == mock_response["data"]
+                assert result["offset"] == mock_response.get(
+                    "offset"
+                ) or mock_response.get("next")
+                # Validate call parameters
+                mock_request.assert_called_with(
+                    "GET",
+                    "/plugins",
+                    params={"name": "jwt", "size": 10},
+                    json_data=None,
+                )
+
+    async def test_get_plugins_by_service(self, mock_kong_responses: Dict[str, Any]):
+        """Test get_plugins_by_service tool."""
+        config = KongClientConfig(base_url="http://kong-admin:8001")
+        async with KongClient(config) as client:
+            with patch.object(client, "_request") as mock_request:
+                service_id = "service-1"
+                mock_response = mock_kong_responses["plugins_by_service"]
+                mock_request.return_value = mock_response
+
+                result = await client.get_plugins_by_service(
+                    service_id, params={"size": 5}
+                )
+
+                assert result["data"] == mock_response["data"]
+                mock_request.assert_called_with(
+                    "GET",
+                    f"/services/{service_id}/plugins",
+                    params={"size": 5},
+                    json_data=None,
+                )
+
+    async def test_get_plugins_by_route(self, mock_kong_responses: Dict[str, Any]):
+        """Test get_plugins_by_route tool."""
+        config = KongClientConfig(base_url="http://kong-admin:8001")
+        async with KongClient(config) as client:
+            with patch.object(client, "_request") as mock_request:
+                route_id = "route-1"
+                mock_response = mock_kong_responses["plugins_by_route"]
+                mock_request.return_value = mock_response
+
+                result = await client.get_plugins_by_route(
+                    route_id, params={"offset": "cursor0"}
+                )
+
+                assert result["data"] == mock_response["data"]
+                mock_request.assert_called_with(
+                    "GET",
+                    f"/routes/{route_id}/plugins",
+                    params={"offset": "cursor0"},
+                    json_data=None,
+                )
+
+    async def test_get_plugins_by_consumer(self, mock_kong_responses: Dict[str, Any]):
+        """Test get_plugins_by_consumer tool."""
+        config = KongClientConfig(base_url="http://kong-admin:8001")
+        async with KongClient(config) as client:
+            with patch.object(client, "_request") as mock_request:
+                consumer_id = "consumer-1"
+                mock_response = mock_kong_responses["plugins_by_consumer"]
+                mock_request.return_value = mock_response
+
+                result = await client.get_plugins_by_consumer(
+                    consumer_id, params={"size": 3}
+                )
+
+                assert result["data"] == mock_response["data"]
+                mock_request.assert_called_with(
+                    "GET",
+                    f"/consumers/{consumer_id}/plugins",
+                    params={"size": 3},
+                    json_data=None,
+                )
 
     @pytest.mark.asyncio
     async def test_kong_client_error_handling_integration(self) -> None:
