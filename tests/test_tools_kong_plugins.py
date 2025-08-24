@@ -23,7 +23,9 @@ class TestKongPluginsTools:
             "next": "cursor123",
         }
 
-        with patch("kong_mcp_server.tools.kong_plugins.KongClient", autospec=True) as mock_client_cls:
+        with patch(
+            "kong_mcp_server.tools.kong_plugins.KongClient", autospec=True
+        ) as mock_client_cls:
             mock_client = AsyncMock()
             mock_client.get_plugins.return_value = mock_response
             mock_client_cls.return_value.__aenter__.return_value = mock_client
@@ -43,7 +45,9 @@ class TestKongPluginsTools:
             "next": None,
         }
 
-        with patch("kong_mcp_server.tools.kong_plugins.KongClient", autospec=True) as mock_client_cls:
+        with patch(
+            "kong_mcp_server.tools.kong_plugins.KongClient", autospec=True
+        ) as mock_client_cls:
             mock_client = AsyncMock()
             mock_client.get_plugins.return_value = mock_response
             mock_client_cls.return_value.__aenter__.return_value = mock_client
@@ -71,7 +75,9 @@ class TestKongPluginsTools:
         """Test get_plugins_by_service with default parameters."""
         mock_response = {"data": [{"id": "p1", "name": "jwt"}], "offset": None}
 
-        with patch("kong_mcp_server.tools.kong_plugins.KongClient", autospec=True) as mock_client_cls:
+        with patch(
+            "kong_mcp_server.tools.kong_plugins.KongClient", autospec=True
+        ) as mock_client_cls:
             mock_client = AsyncMock()
             mock_client.get_plugins_by_service.return_value = mock_response
             mock_client_cls.return_value.__aenter__.return_value = mock_client
@@ -88,7 +94,9 @@ class TestKongPluginsTools:
         """Test get_plugins_by_service with size and offset."""
         mock_response = {"data": [{"id": "p2"}], "offset": "cursor1"}
 
-        with patch("kong_mcp_server.tools.kong_plugins.KongClient", autospec=True) as mock_client_cls:
+        with patch(
+            "kong_mcp_server.tools.kong_plugins.KongClient", autospec=True
+        ) as mock_client_cls:
             mock_client = AsyncMock()
             mock_client.get_plugins_by_service.return_value = mock_response
             mock_client_cls.return_value.__aenter__.return_value = mock_client
@@ -106,7 +114,9 @@ class TestKongPluginsTools:
         """Test get_plugins_by_route with default parameters."""
         mock_response = {"data": [{"id": "r1"}], "offset": None}
 
-        with patch("kong_mcp_server.tools.kong_plugins.KongClient", autospec=True) as mock_client_cls:
+        with patch(
+            "kong_mcp_server.tools.kong_plugins.KongClient", autospec=True
+        ) as mock_client_cls:
             mock_client = AsyncMock()
             mock_client.get_plugins_by_route.return_value = mock_response
             mock_client_cls.return_value.__aenter__.return_value = mock_client
@@ -123,7 +133,9 @@ class TestKongPluginsTools:
         """Test get_plugins_by_route with size and offset."""
         mock_response = {"data": [{"id": "r2"}], "offset": "cursor2"}
 
-        with patch("kong_mcp_server.tools.kong_plugins.KongClient", autospec=True) as mock_client_cls:
+        with patch(
+            "kong_mcp_server.tools.kong_plugins.KongClient", autospec=True
+        ) as mock_client_cls:
             mock_client = AsyncMock()
             mock_client.get_plugins_by_route.return_value = mock_response
             mock_client_cls.return_value.__aenter__.return_value = mock_client
@@ -141,7 +153,9 @@ class TestKongPluginsTools:
         """Test get_plugins_by_consumer with default parameters."""
         mock_response = {"data": [{"id": "c1"}], "offset": None}
 
-        with patch("kong_mcp_server.tools.kong_plugins.KongClient", autospec=True) as mock_client_cls:
+        with patch(
+            "kong_mcp_server.tools.kong_plugins.KongClient", autospec=True
+        ) as mock_client_cls:
             mock_client = AsyncMock()
             mock_client.get_plugins_by_consumer.return_value = mock_response
             mock_client_cls.return_value.__aenter__.return_value = mock_client
@@ -158,7 +172,9 @@ class TestKongPluginsTools:
         """Test get_plugins_by_consumer with size and offset."""
         mock_response = {"data": [{"id": "c2"}], "offset": "cursorC"}
 
-        with patch("kong_mcp_server.tools.kong_plugins.KongClient", autospec=True) as mock_client_cls:
+        with patch(
+            "kong_mcp_server.tools.kong_plugins.KongClient", autospec=True
+        ) as mock_client_cls:
             mock_client = AsyncMock()
             mock_client.get_plugins_by_consumer.return_value = mock_response
             mock_client_cls.return_value.__aenter__.return_value = mock_client

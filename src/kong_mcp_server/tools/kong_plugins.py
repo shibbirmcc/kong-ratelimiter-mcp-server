@@ -6,9 +6,7 @@ from kong_mcp_server.kong_client import KongClient
 
 
 async def get_plugins(
-        name: Optional[str]=None,
-        offset: Optional[str]=None,
-        size: Optional[int]=None
+    name: Optional[str] = None, offset: Optional[str] = None, size: Optional[int] = None
 ) -> Dict[str, Any]:
     """Retrieve Kong plugins.
 
@@ -16,37 +14,37 @@ async def get_plugins(
     name: Filter by plugin name (e.g., "rate-limiting", "rate-limiting-advanced")
     offset: Pagination cursor returned by Kong from a previous call
     size: Page size (Kong default is typically 100)
-        
+
     Returns:
         List of Kong plugins data.
     """
     if size is not None:
-        if size <1 or size>1000:
+        if size < 1 or size > 1000:
             raise ValueError("Size must be between 1 and 1000")
-        
-    params: Dict[str,Any]={}
+
+    params: Dict[str, Any] = {}
     if name:
-        params["name"]=name
+        params["name"] = name
     if offset:
-        params["offset"]=offset
+        params["offset"] = offset
     if size:
-        params["size"]=size
+        params["size"] = size
 
     async with KongClient() as client:
-        response= await client.get_plugins(params=params)
-    next_offset=response.get("offset")
+        response = await client.get_plugins(params=params)
+    next_offset = response.get("offset")
     if not next_offset and "next" in response:
-        next_offset=response.get("next")
+        next_offset = response.get("next")
 
-    return{
-        "data":response.get("data",[]),
+    return {
+        "data": response.get("data", []),
         "offset": next_offset,
     }
+
+
 async def get_plugins_by_service(
-        service_id: str,
-        size:Optional[int]=None,
-        offset:Optional[str]=None
-) -> dict[str,Any]:
+    service_id: str, size: Optional[int] = None, offset: Optional[str] = None
+) -> dict[str, Any]:
     """
     Retrieve plugins associated with a specific Kong service.
 
@@ -67,13 +65,12 @@ async def get_plugins_by_service(
         params["offset"] = offset
 
     async with KongClient() as client:
-        return await client.get_plugins_by_service(service_id=service_id,params=params)
-    
+        return await client.get_plugins_by_service(service_id=service_id, params=params)
+
+
 async def get_plugins_by_route(
-        route_id: str,
-        size:Optional[int]=None,
-        offset:Optional[str]=None
-) -> dict[str,Any]:
+    route_id: str, size: Optional[int] = None, offset: Optional[str] = None
+) -> dict[str, Any]:
     """
     Retrieve plugins associated with a specific Kong route.
 
@@ -94,12 +91,12 @@ async def get_plugins_by_route(
         params["offset"] = offset
 
     async with KongClient() as client:
-        return await client.get_plugins_by_route(route_id=route_id,params=params)
+        return await client.get_plugins_by_route(route_id=route_id, params=params)
+
+
 async def get_plugins_by_consumer(
-        consumer_id: str,
-        size:Optional[int]=None,
-        offset:Optional[str]=None
-) -> dict[str,Any]:
+    consumer_id: str, size: Optional[int] = None, offset: Optional[str] = None
+) -> dict[str, Any]:
     """
     Retrieve plugins associated with a specific Kong consumer.
 
@@ -120,4 +117,6 @@ async def get_plugins_by_consumer(
         params["offset"] = offset
 
     async with KongClient() as client:
-        return await client.get_plugins_by_consumer(consumer_id=consumer_id,params=params)
+        return await client.get_plugins_by_consumer(
+            consumer_id=consumer_id, params=params
+        )

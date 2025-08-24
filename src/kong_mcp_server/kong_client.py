@@ -402,30 +402,55 @@ class KongClient:
         """
         return await self.get("/status")
 
-    async def get_plugins(self, params: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    async def get_plugins(
+        self, params: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
         """
         GET /plugins with optional query params.
         Returns the full Kong pagination envelope: {"data": [...], "offset": "..."}
         """
-        return await self._request("GET", "/plugins", params=params,json_data=None,)
-    
-    async def get_plugins_by_service(self,service_id:str,params: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        return await self._request(
+            "GET",
+            "/plugins",
+            params=params,
+            json_data=None,
+        )
+
+    async def get_plugins_by_service(
+        self, service_id: str, params: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
         """
         GET /plugins by service id.
         Returns the full Kong pagination envelope: {"data": [...], "offset": "..."}
         """
-        return await self._request("GET", f"/services/{service_id}/plugins", params=params,json_data=None,)
-    
-    async def get_plugins_by_route(self,route_id:str,params: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        return await self._request(
+            "GET",
+            f"/services/{service_id}/plugins",
+            params=params,
+            json_data=None,
+        )
+
+    async def get_plugins_by_route(
+        self, route_id: str, params: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
         """
         GET /plugins by route id.
         Returns the full Kong pagination envelope: {"data": [...], "offset": "..."}
         """
-        return await self._request("GET", f"/routes/{route_id}/plugins", params=params,json_data=None,)
-    
-    async def get_plugins_by_consumer(self,consumer_id:str,params: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        return await self._request(
+            "GET",
+            f"/routes/{route_id}/plugins",
+            params=params,
+            json_data=None,
+        )
+
+    async def get_plugins_by_consumer(
+        self, consumer_id: str, params: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
         """
         GET /plugins by consumer id.
         Returns the full Kong pagination envelope: {"data": [...], "offset": "..."}
         """
-        return await self._request("GET", f"/consumers/{consumer_id}/plugins", params=params,json_data=None)
+        return await self._request(
+            "GET", f"/consumers/{consumer_id}/plugins", params=params, json_data=None
+        )
