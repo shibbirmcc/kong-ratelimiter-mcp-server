@@ -244,11 +244,7 @@ def main() -> None:
     port = int(os.environ.get("FASTMCP_PORT", "8080"))
 
     # Run the server with SSE transport on /sse/ endpoint
-<<<<<<< HEAD
-    mcp.run("sse", path="/sse/",port=8080)
-=======
     mcp.run("sse", path="/sse/", port=port)
->>>>>>> master
 
 
 if __name__ == "__main__":
