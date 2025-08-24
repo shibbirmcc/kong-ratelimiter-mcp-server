@@ -1,12 +1,14 @@
 """Tests for Kong plugins tools."""
 
 from unittest.mock import AsyncMock, patch
+
 import pytest
+
 from kong_mcp_server.tools.kong_plugins import (
     get_plugins,
-    get_plugins_by_service,
-    get_plugins_by_route,
     get_plugins_by_consumer,
+    get_plugins_by_route,
+    get_plugins_by_service,
 )
 
 
