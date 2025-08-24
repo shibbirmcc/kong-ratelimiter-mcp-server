@@ -83,3 +83,6 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+
+logs
+logs/*

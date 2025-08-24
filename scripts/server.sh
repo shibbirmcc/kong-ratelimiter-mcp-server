@@ -7,8 +7,9 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
-PID_FILE="/tmp/kong_mcp_server.pid"
-LOG_FILE="/tmp/kong_mcp_server.log"
+LOGS_DIR="$PROJECT_DIR/logs"
+PID_FILE="$LOGS_DIR/kong_mcp_server.pid"
+LOG_FILE="$LOGS_DIR/kong_mcp_server.log"
 SERVER_MODULE="kong_mcp_server.server"
 DEFAULT_HOST="127.0.0.1"
 DEFAULT_PORT="8080"
@@ -35,6 +36,14 @@ print_warning() {
 
 print_error() {
     echo -e "${RED}[ERROR]${NC} $1"
+}
+
+# Ensure logs directory exists
+ensure_logs_dir() {
+    if [ ! -d "$LOGS_DIR" ]; then
+        mkdir -p "$LOGS_DIR"
+        print_status "Created logs directory: $LOGS_DIR"
+    fi
 }
 
 # Check if server is running
@@ -68,6 +77,9 @@ start_server() {
         return 0
     fi
     
+    # Ensure logs directory exists
+    ensure_logs_dir
+    
     # Change to project directory
     cd "$PROJECT_DIR"
     
@@ -92,7 +104,8 @@ start_server() {
     if is_running; then
         print_success "Server started successfully (PID: $server_pid)"
         print_status "Server logs: $LOG_FILE"
-        print_status "Default endpoint: http://${DEFAULT_HOST}:${DEFAULT_PORT}/sse/"
+        local display_port=${FASTMCP_PORT:-$DEFAULT_PORT}
+        print_status "Server endpoint: http://${DEFAULT_HOST}:${display_port}/sse/"
     else
         print_error "Failed to start server"
         if [ -f "$LOG_FILE" ]; then
@@ -149,6 +162,41 @@ restart_server() {
     stop_server
     sleep 1
     start_server
+}
+
+# Health check function
+health_check() {
+    print_status "Performing health check..."
+    
+    if ! is_running; then
+        print_error "Health check failed: Server is not running"
+        return 1
+    fi
+    
+    local pid=$(get_pid)
+    print_status "Server process is running (PID: $pid)"
+    
+    # Check if the server is responding on the expected port
+    local host=${HOST:-$DEFAULT_HOST}
+    local port=${FASTMCP_PORT:-$DEFAULT_PORT}
+    
+    print_status "Checking server endpoint: http://$host:$port/sse/"
+    
+    # Use curl to check if server responds (with timeout)
+    if command -v curl >/dev/null 2>&1; then
+        if curl -s --connect-timeout 5 --max-time 10 "http://$host:$port/sse/" >/dev/null 2>&1; then
+            print_success "Health check passed: Server is responding"
+            return 0
+        else
+            print_warning "Health check partial: Server process running but not responding on http://$host:$port/sse/"
+            print_status "This might be normal if the server is still starting up"
+            return 2
+        fi
+    else
+        print_warning "curl not available, skipping endpoint check"
+        print_success "Health check partial: Server process is running"
+        return 0
+    fi
 }
 
 # Show server status
@@ -208,25 +256,27 @@ follow_logs() {
 show_help() {
     echo "Kong MCP Server Management Script"
     echo
-    echo "Usage: $0 {start|stop|restart|status|logs|follow|help}"
+    echo "Usage: $0 {start|stop|restart|status|health|logs|follow|help}"
     echo
     echo "Commands:"
     echo "  start    - Start the Kong MCP Server"
     echo "  stop     - Stop the Kong MCP Server"
     echo "  restart  - Restart the Kong MCP Server"
     echo "  status   - Show server status and recent logs"
+    echo "  health   - Perform health check on running server"
     echo "  logs     - Show all server logs"
     echo "  follow   - Follow server logs in real-time"
     echo "  help     - Show this help message"
     echo
     echo "Files:"
+    echo "  Logs dir: $LOGS_DIR"
     echo "  PID file: $PID_FILE"
     echo "  Log file: $LOG_FILE"
     echo "  Project:  $PROJECT_DIR"
     echo
     echo "Environment Variables:"
     echo "  HOST     - Server host (default: $DEFAULT_HOST)"
-    echo "  PORT     - Server port (default: $DEFAULT_PORT)"
+    echo "  FASTMCP_PORT - Server port (default: $DEFAULT_PORT)"
     echo
     echo "Examples:"
     echo "  $0 start         # Start the server"
@@ -248,6 +298,9 @@ case "${1:-}" in
         ;;
     "status")
         show_status
+        ;;
+    "health")
+        health_check
         ;;
     "logs")
         show_logs

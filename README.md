@@ -21,27 +21,24 @@ A Model Context Protocol (MCP) server for Kong configuration management, built w
 
 ## Quick Start
 
-### Option 1: Using the Virtual Environment Script (Recommended)
-
+### Option 1: Virtual Environment Script (Recommended)
 ```bash
-# Activate virtual environment and install dependencies
-./venv.sh
-
-# Run server
-python -m kong_mcp_server.server
-
-# Run tests
-pytest
-
-# Check coverage
-pytest --cov=kong_mcp_server
-
-# Deactivate when done
-./venv.sh deactivate
+./venv.sh                                    # Setup and activate
+python -m kong_mcp_server.server            # Run server
+pytest --cov=kong_mcp_server                # Run tests with coverage
+./venv.sh deactivate                         # Cleanup
 ```
 
-### Option 2: Manual Setup
+### Option 2: Server Management Script
+```bash
+./scripts/server.sh start                    # Start server
+./scripts/server.sh status                   # Check status
+./scripts/server.sh health                   # Health check
+./scripts/server.sh logs                     # View logs
+./scripts/server.sh stop                     # Stop server
+```
 
+### Option 3: Manual Setup
 ```bash
 # Create and activate virtual environment
 python -m venv venv
@@ -110,6 +107,50 @@ Tools are configured in `tools_config.json`:
 }
 ```
 
+## Configuration
+
+### Environment Variables
+```bash
+# Server Configuration
+export FASTMCP_PORT=8080                     # Server port (default: 8080)
+export HOST=127.0.0.1                       # Server host (default: 127.0.0.1)
+
+# Kong Configuration
+export KONG_ADMIN_URL=http://localhost:8001  # Kong Admin API URL
+export KONG_USERNAME=admin                   # Kong CE username
+export KONG_PASSWORD=secret                  # Kong CE password
+export KONG_API_TOKEN=token                  # Kong EE API token (alternative)
+export KONG_TIMEOUT=30.0                     # Request timeout (seconds)
+export KONG_VERIFY_SSL=true                  # SSL verification
+```
+
+### Kong Authentication
+
+**Community Edition (Username/Password):**
+```bash
+export KONG_USERNAME=admin
+export KONG_PASSWORD=your-password
+```
+
+**Enterprise Edition (API Token):**
+```bash
+export KONG_API_TOKEN=your-api-token
+```
+
+### Port Configuration Examples
+```bash
+# Use default port 8080 (no environment variable needed)
+python -m kong_mcp_server.server
+./scripts/server.sh start
+
+# Change to custom port
+FASTMCP_PORT=9000 python -m kong_mcp_server.server
+FASTMCP_PORT=9000 ./scripts/server.sh start
+
+# Docker with custom port
+docker run -p 9000:9000 -e FASTMCP_PORT=9000 kong-mcp-server
+```
+
 ### Available Tools
 
 - **hello_world**: Basic test tool that returns a greeting message
@@ -145,6 +186,9 @@ pytest --cov=kong_mcp_server --cov-report=term-missing
 # Generate text coverage report
 pytest --cov=kong_mcp_server --cov-report=xml
 coverage report > coverage.txt
+
+# Integration testing (requires testcontainers)
+RUN_LIVE_TESTS=true pytest tests/test_kong_integration.py
 ```
 
 ## Development
@@ -328,17 +372,17 @@ The server uses port 8080 by default. You can change this in several ways:
 #### Method 1: Environment Variable
 ```bash
 # Set custom port
-export FASTMCP_PORT=3000
+export FASTMCP_PORT=9000
 python -m kong_mcp_server.server
 ```
 
 #### Method 2: Docker Run
 ```bash
 # Map to a different host port (container still uses 8080)
-docker run -p 3000:8080 kong-mcp-server
+docker run -p 9000:8080 kong-mcp-server
 
 # Or change both host and container port
-docker run -p 3000:3000 -e FASTMCP_PORT=3000 kong-mcp-server
+docker run -p 9000:9000 -e FASTMCP_PORT=9000 kong-mcp-server
 ```
 
 #### Method 3: Docker Compose
@@ -348,7 +392,7 @@ services:
   kong-mcp-server:
     build: .
     ports:
-      - "3000:8080"  # Host port 3000, container port 8080
+      - "9000:8080"  # Host port 9000, container port 8080
     environment:
       - FASTMCP_PORT=8080    # Keep container port as 8080
 ```
@@ -356,7 +400,7 @@ services:
 #### Method 4: Server Management Script
 ```bash
 # Set port via environment variable
-FASTMCP_PORT=3000 ./scripts/server.sh start
+FASTMCP_PORT=9000 ./scripts/server.sh start
 ```
 
 ## Running with Different Configurations
@@ -435,20 +479,57 @@ docker restart kong-mcp
 
 ## Testing with MCP Inspector
 
-After starting the MCP server, you can use the MCP Inspector to test the available tools interactively:
+### Installation
 
 ```bash
-# Start the MCP server first
-python -m kong_mcp_server.server
-
-# In a new terminal, install and run MCP Inspector
-npx @modelcontextprotocol/inspector http://localhost:8080/sse/
+# Install MCP Inspector globally
+npm install -g @modelcontextprotocol/inspector
 ```
 
-The MCP Inspector provides a web-based interface where you can:
-- View all available tools and their descriptions
-- Test tool functionality with custom parameters
-- Examine tool schemas and input/output formats
-- Debug MCP communication and server responses
+### Testing the Server
 
-This is particularly useful for validating that your Kong API tools are working correctly before integrating with LLM clients like Claude Code.
+```bash
+# Start the Kong MCP server
+python -m kong_mcp_server.server
+
+# In a new terminal, test with MCP Inspector using SSE transport
+mcp-inspector --transport sse --server-url http://localhost:8080/sse
+
+# Alternative: Test with HTTP transport (for JSON-RPC requests)
+mcp-inspector --transport http --server-url http://localhost:8080/sse/request
+```
+
+### Manual Testing with cURL
+
+You can also test the server endpoints manually:
+
+```bash
+# Test API discovery
+curl -X GET http://localhost:8080/api
+
+# Test tools/list endpoint
+curl -X POST http://localhost:8080/sse/request \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc": "2.0", "id": "test", "method": "tools/list"}'
+
+# Test tool execution (example: get Kong routes)
+curl -X POST http://localhost:8080/sse/request \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc": "2.0", "id": "test", "method": "tools/call", "params": {"name": "kong_get_routes", "arguments": {}}}'
+```
+
+### Web Interface
+
+The MCP Inspector provides a web interface for interactive testing:
+
+1. Run `mcp-inspector --transport sse --server-url http://localhost:8080/sse`
+2. Open the browser URL displayed in the terminal
+3. Use the web interface to:
+   - View all available tools
+   - Inspect tool schemas
+   - Execute tools with custom parameters
+   - Debug responses in real-time
+
+## License
+
+Apache 2.0
