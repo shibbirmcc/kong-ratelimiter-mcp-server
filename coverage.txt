@@ -1,11 +1,13 @@
-Name                                         Stmts   Miss  Cover
-----------------------------------------------------------------
-src/kong_mcp_server/__init__.py                  5      2    60%
-src/kong_mcp_server/kong_client.py              88      0   100%
-src/kong_mcp_server/server.py                   79     23    71%
-src/kong_mcp_server/tools/__init__.py            0      0   100%
-src/kong_mcp_server/tools/basic.py               2      0   100%
-src/kong_mcp_server/tools/kong_routes.py        39      0   100%
-src/kong_mcp_server/tools/kong_services.py      35      2    94%
-----------------------------------------------------------------
-TOTAL                                          248     27    89%
+Name                                              Stmts   Miss  Cover
+---------------------------------------------------------------------
+src/kong_mcp_server/__init__.py                       5      2    60%
+src/kong_mcp_server/kong_client.py                   96      0   100%
+src/kong_mcp_server/server.py                        79     23    71%
+src/kong_mcp_server/tools/__init__.py                 0      0   100%
+src/kong_mcp_server/tools/basic.py                    2      0   100%
+src/kong_mcp_server/tools/kong_plugins.py            43      0   100%
+src/kong_mcp_server/tools/kong_rate_limiting.py     120     13    89%
+src/kong_mcp_server/tools/kong_routes.py             39      0   100%
+src/kong_mcp_server/tools/kong_services.py           35      2    94%
+---------------------------------------------------------------------
+TOTAL                                               419     40    90%

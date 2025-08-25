@@ -70,20 +70,20 @@
       "function": "get_plugins_by_service",
       "enabled": true
     },
-      "kong_get_plugins_by_route": {
+    "kong_get_plugins_by_route": {
       "name": "kong_get_plugins_by_route",
       "description": "Retrieve route scoped Kong plugins with optional filtering by name and pagination.",
       "module": "kong_mcp_server.tools.kong_plugins",
       "function": "get_plugins_by_route",
       "enabled": true
     },
-      "kong_get_plugins_by_consumer": {
+    "kong_get_plugins_by_consumer": {
       "name": "kong_get_plugins_by_consumer",
       "description": "Retrieve consumer scoped Kong plugins with optional filtering by name and pagination.",
       "module": "kong_mcp_server.tools.kong_plugins",
       "function": "get_plugins_by_consumer",
       "enabled": true
-      },
+    },
     "kong_create_rate_limiting_plugin": {
       "name": "kong_create_rate_limiting_plugin",
       "description": "Create a basic rate limiting plugin with support for all scopes (global, service, route, consumer) and time-based limits (second, minute, hour, day, month, year)",
@@ -119,4 +119,5 @@
       "function": "get_plugin",
       "enabled": true
     }
+  }
 }

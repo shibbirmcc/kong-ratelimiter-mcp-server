@@ -4,8 +4,8 @@ from typing import Any, Dict, List, Optional
 
 from kong_mcp_server.kong_client import KongClient
 
-
 # Basic Rate Limiting Plugin Tools
+
 
 async def create_rate_limiting_plugin(
     minute: Optional[int] = None,
@@ -155,7 +155,8 @@ async def get_rate_limiting_plugins(
 
     async with KongClient() as client:
         response = await client.get(endpoint, params=params)
-        return response.get("data", [])
+        data = response.get("data", [])
+        return data if isinstance(data, list) else []
 
 
 async def update_rate_limiting_plugin(
@@ -268,11 +269,12 @@ async def delete_rate_limiting_plugin(plugin_id: str) -> Dict[str, Any]:
         await client.delete(f"/plugins/{plugin_id}")
         return {
             "message": "Rate limiting plugin deleted successfully",
-            "plugin_id": plugin_id
+            "plugin_id": plugin_id,
         }
 
 
 # General Plugin Management Tools
+
 
 async def get_plugin(plugin_id: str) -> Dict[str, Any]:
     """Get a specific plugin by ID.
@@ -330,4 +332,5 @@ async def get_plugins(
 
     async with KongClient() as client:
         response = await client.get(endpoint, params=params)
-        return response.get("data", [])
+        data = response.get("data", [])
+        return data if isinstance(data, list) else []

@@ -1,15 +1,16 @@
 """Unit tests for Kong rate limiting plugin management tools."""
 
-import pytest
 from unittest.mock import AsyncMock, patch
+
+import pytest
 
 from kong_mcp_server.tools.kong_rate_limiting import (
     create_rate_limiting_plugin,
-    get_rate_limiting_plugins,
-    update_rate_limiting_plugin,
     delete_rate_limiting_plugin,
     get_plugin,
     get_plugins,
+    get_rate_limiting_plugins,
+    update_rate_limiting_plugin,
 )
 
 
@@ -144,9 +145,7 @@ class TestBasicRateLimitingPlugin:
         expected_response = {"id": "plugin-789", "name": "rate-limiting"}
         mock_kong_client.post.return_value = expected_response
 
-        result = await create_rate_limiting_plugin(
-            minute=50, service_id="service-123"
-        )
+        result = await create_rate_limiting_plugin(minute=50, service_id="service-123")
 
         mock_kong_client.post.assert_called_once_with(
             "/services/service-123/plugins",
@@ -170,9 +169,7 @@ class TestBasicRateLimitingPlugin:
         expected_response = {"id": "plugin-101", "name": "rate-limiting"}
         mock_kong_client.post.return_value = expected_response
 
-        result = await create_rate_limiting_plugin(
-            hour=200, route_id="route-456"
-        )
+        result = await create_rate_limiting_plugin(hour=200, route_id="route-456")
 
         mock_kong_client.post.assert_called_once_with(
             "/routes/route-456/plugins",
@@ -196,9 +193,7 @@ class TestBasicRateLimitingPlugin:
         expected_response = {"id": "plugin-202", "name": "rate-limiting"}
         mock_kong_client.post.return_value = expected_response
 
-        result = await create_rate_limiting_plugin(
-            day=1000, consumer_id="consumer-789"
-        )
+        result = await create_rate_limiting_plugin(day=1000, consumer_id="consumer-789")
 
         mock_kong_client.post.assert_called_once_with(
             "/consumers/consumer-789/plugins",
@@ -370,9 +365,7 @@ class TestGeneralPluginManagement:
     @pytest.mark.asyncio
     async def test_get_plugins_with_filters(self, mock_kong_client):
         """Test getting plugins with filters."""
-        expected_response = {
-            "data": [{"id": "plugin-3", "name": "rate-limiting"}]
-        }
+        expected_response = {"data": [{"id": "plugin-3", "name": "rate-limiting"}]}
         mock_kong_client.get.return_value = expected_response
 
         result = await get_plugins(
