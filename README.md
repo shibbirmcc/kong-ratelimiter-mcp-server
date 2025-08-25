@@ -168,7 +168,16 @@ docker run -p 9000:9000 -e FASTMCP_PORT=9000 kong-mcp-server
   - `kong_get_plugins`: Retrieve all plugins with optional filtering and pagination  
   - `kong_get_plugins_by_service`: Retrieve plugins scoped to a specific service  
   - `kong_get_plugins_by_route`: Retrieve plugins scoped to a specific route  
-  - `kong_get_plugins_by_consumer`: Retrieve plugins scoped to a specific consumer  
+  - `kong_get_plugins_by_consumer`: Retrieve plugins scoped to a specific consumer
+- **Kong Rate Limiting**: CRUD operations for Kong basic rate limiting plugins (Community Edition)
+  - `kong_create_rate_limiting_plugin`: Create basic rate limiting plugin with support for all scopes (global, service, route, consumer) and time-based limits
+  - `kong_get_rate_limiting_plugins`: Retrieve basic rate limiting plugins with filtering by scope, tags, and pagination support
+  - `kong_update_rate_limiting_plugin`: Update basic rate limiting plugin configuration including limits, policies, and Redis settings
+  - `kong_delete_rate_limiting_plugin`: Delete basic rate limiting plugin by plugin ID
+- **Kong Plugin Management**: General plugin management operations
+  - `kong_get_plugin`: Get specific plugin by ID with full configuration details
+  - `kong_get_plugins`: Get all plugins with optional filtering by name, scope, tags, and pagination support
+
 ### Adding New Tools
 
 1. Create a new module in `src/kong_mcp_server/tools/`
@@ -268,11 +277,10 @@ To use this MCP server with Claude Code, add the server configuration to your MC
 {
   "mcpServers": {
     "kong-rate-limiter": {
-      "command": "kong-mcp-server",
-      "args": [],
-      "env": {
-        "KONG_ADMIN_URL": "http://localhost:8001"
-      }
+      "disabled": false,
+      "timeout": 60,
+      "type": "sse",
+      "url": "http://localhost:8080/sse"
     }
   }
 }
@@ -491,7 +499,6 @@ npm install -g @modelcontextprotocol/inspector
 ```
 
 ### Testing the Server
-
 ```bash
 # Start the Kong MCP server
 python -m kong_mcp_server.server

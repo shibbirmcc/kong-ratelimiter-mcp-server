@@ -70,18 +70,53 @@
       "function": "get_plugins_by_service",
       "enabled": true
     },
-      "kong_get_plugins_by_route": {
+    "kong_get_plugins_by_route": {
       "name": "kong_get_plugins_by_route",
       "description": "Retrieve route scoped Kong plugins with optional filtering by name and pagination.",
       "module": "kong_mcp_server.tools.kong_plugins",
       "function": "get_plugins_by_route",
       "enabled": true
     },
-      "kong_get_plugins_by_consumer": {
+    "kong_get_plugins_by_consumer": {
       "name": "kong_get_plugins_by_consumer",
       "description": "Retrieve consumer scoped Kong plugins with optional filtering by name and pagination.",
       "module": "kong_mcp_server.tools.kong_plugins",
       "function": "get_plugins_by_consumer",
+      "enabled": true
+    },
+    "kong_create_rate_limiting_plugin": {
+      "name": "kong_create_rate_limiting_plugin",
+      "description": "Create a basic rate limiting plugin with support for all scopes (global, service, route, consumer) and time-based limits (second, minute, hour, day, month, year)",
+      "module": "kong_mcp_server.tools.kong_rate_limiting",
+      "function": "create_rate_limiting_plugin",
+      "enabled": true
+    },
+    "kong_get_rate_limiting_plugins": {
+      "name": "kong_get_rate_limiting_plugins",
+      "description": "Retrieve basic rate limiting plugins with filtering by scope, tags, and pagination support",
+      "module": "kong_mcp_server.tools.kong_rate_limiting",
+      "function": "get_rate_limiting_plugins",
+      "enabled": true
+    },
+    "kong_update_rate_limiting_plugin": {
+      "name": "kong_update_rate_limiting_plugin",
+      "description": "Update basic rate limiting plugin configuration including limits, policies, and Redis settings",
+      "module": "kong_mcp_server.tools.kong_rate_limiting",
+      "function": "update_rate_limiting_plugin",
+      "enabled": true
+    },
+    "kong_delete_rate_limiting_plugin": {
+      "name": "kong_delete_rate_limiting_plugin",
+      "description": "Delete a basic rate limiting plugin by plugin ID",
+      "module": "kong_mcp_server.tools.kong_rate_limiting",
+      "function": "delete_rate_limiting_plugin",
+      "enabled": true
+    },
+    "kong_get_plugin": {
+      "name": "kong_get_plugin",
+      "description": "Get a specific Kong plugin by ID with full configuration details",
+      "module": "kong_mcp_server.tools.kong_rate_limiting",
+      "function": "get_plugin",
       "enabled": true
     }
   }
