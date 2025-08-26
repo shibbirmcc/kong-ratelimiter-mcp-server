@@ -18,6 +18,7 @@ async def create_rate_limiting_plugin(
     policy: str = "local",
     fault_tolerant: bool = True,
     hide_client_headers: bool = False,
+    header_name: Optional[str] = None,
     redis_host: Optional[str] = None,
     redis_port: int = 6379,
     redis_password: Optional[str] = None,
@@ -64,6 +65,10 @@ async def create_rate_limiting_plugin(
         "fault_tolerant": fault_tolerant,
         "hide_client_headers": hide_client_headers,
     }
+    
+    # Add header configuration for header-based limiting
+    if header_name is not None:
+        config["header_name"] = header_name
 
     # Add time-based limits
     if second is not None:
@@ -171,6 +176,7 @@ async def update_rate_limiting_plugin(
     policy: Optional[str] = None,
     fault_tolerant: Optional[bool] = None,
     hide_client_headers: Optional[bool] = None,
+    header_name: Optional[str] = None,
     redis_host: Optional[str] = None,
     redis_port: Optional[int] = None,
     redis_password: Optional[str] = None,
@@ -231,6 +237,8 @@ async def update_rate_limiting_plugin(
         config["fault_tolerant"] = fault_tolerant
     if hide_client_headers is not None:
         config["hide_client_headers"] = hide_client_headers
+    if header_name is not None:
+        config["header_name"] = header_name
 
     # Update Redis configuration
     if redis_host is not None:
