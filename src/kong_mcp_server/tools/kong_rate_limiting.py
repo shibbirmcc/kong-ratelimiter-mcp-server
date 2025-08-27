@@ -65,7 +65,7 @@ async def create_rate_limiting_plugin(
         "fault_tolerant": fault_tolerant,
         "hide_client_headers": hide_client_headers,
     }
-    
+
     # Add header configuration for header-based limiting
     if header_name is not None:
         config["header_name"] = header_name
