@@ -226,6 +226,15 @@ isort src/ tests/
 
 The Kong Rate Limiter MCP Server is available on Docker Hub as `shibbirmcc/kong-ratelimiter-mcp-server`.
 
+#### Host Configuration
+
+By default, the server binds to `127.0.0.1`, which works for local development but may not be accessible when running in Docker. For Docker deployments, especially on Windows, you might need to bind to `0.0.0.0` to allow external access:
+
+```bash
+# Run with custom host binding
+docker run -p 8080:8080 -e FASTMCP_HOST=0.0.0.0 shibbirmcc/kong-ratelimiter-mcp-server
+```
+
 #### Quick Start with Docker Hub
 
 ```bash
