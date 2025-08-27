@@ -222,7 +222,75 @@ isort src/ tests/
 
 ## Docker Deployment
 
-### Building the Docker Image
+### Running from Docker Hub
+
+The Kong Rate Limiter MCP Server is available on Docker Hub as `shibbirmcc/kong-ratelimiter-mcp-server`.
+
+#### Quick Start with Docker Hub
+
+```bash
+# Pull and run the latest image with host network
+docker run --network host shibbirmcc/kong-ratelimiter-mcp-server
+
+# Run with a specific version
+docker run --network host shibbirmcc/kong-ratelimiter-mcp-server:latest
+
+# Run in detached mode with a custom name
+docker run -d --network host --name kong-mcp shibbirmcc/kong-ratelimiter-mcp-server
+```
+
+#### Running with Environment Variables
+
+Configure the server using environment variables to connect to your Kong instance:
+
+```bash
+# Basic configuration (Kong without authentication)
+docker run -d --network host \
+  --name kong-mcp \
+  -e KONG_ADMIN_URL=http://localhost:8001 \
+  shibbirmcc/kong-ratelimiter-mcp-server
+
+# Custom port configuration
+docker run -d --network host \
+  --name kong-mcp \
+  -e HOST=127.0.0.1 \
+  -e FASTMCP_PORT=8080 \
+  -e KONG_ADMIN_URL=http://localhost:8001 \
+  shibbirmcc/kong-ratelimiter-mcp-server
+
+# Full configuration with all options
+docker run -d --network host \
+  --name kong-mcp \
+  -e HOST=0.0.0.0 \
+  -e FASTMCP_PORT=8080 \
+  -e KONG_ADMIN_URL=http://localhost:8001 \
+  -e KONG_TIMEOUT=45.0 \
+  -e KONG_VERIFY_SSL=false \
+  shibbirmcc/kong-ratelimiter-mcp-server
+
+# Using a different port
+docker run -d --network host \
+  --name kong-mcp \
+  -e FASTMCP_PORT=9000 \
+  -e KONG_ADMIN_URL=http://localhost:8001 \
+  shibbirmcc/kong-ratelimiter-mcp-server
+```
+
+#### Kong Enterprise Edition with API Token
+
+If you're using Kong Enterprise Edition with API token authentication:
+
+```bash
+docker run -d --network host \
+  --name kong-mcp \
+  -e KONG_ADMIN_URL=http://localhost:8001 \
+  -e KONG_API_TOKEN=your-api-token \
+  shibbirmcc/kong-ratelimiter-mcp-server
+```
+
+### Building the Docker Image Locally
+
+If you want to build the image locally instead of using Docker Hub:
 
 ```bash
 # Build the image
@@ -232,17 +300,17 @@ docker build -t kong-mcp-server .
 docker build -t kong-mcp-server:0.1.2 .
 ```
 
-### Running with Docker
+### Running Locally Built Image
 
 ```bash
-# Run the container
-docker run -p 8080:8080 kong-mcp-server
+# Run the container with host network
+docker run --network host kong-mcp-server
 
 # Run in detached mode
-docker run -d -p 8080:8080 --name kong-mcp kong-mcp-server
+docker run -d --network host --name kong-mcp kong-mcp-server
 
-# Run with environment variables (if needed)
-docker run -p 8080:8080 -e KONG_ADMIN_URL=http://kong:8001 kong-mcp-server
+# Run with environment variables
+docker run --network host -e KONG_ADMIN_URL=http://localhost:8001 kong-mcp-server
 ```
 
 ### Docker Compose
