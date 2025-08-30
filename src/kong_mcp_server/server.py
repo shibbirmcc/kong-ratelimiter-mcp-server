@@ -240,11 +240,12 @@ def main() -> None:
     # Set up tools before starting the server
     setup_tools()
 
-    # Get port from environment variable with fallback to 8080
+    # Get host and port from environment variables with fallbacks
+    host = os.environ.get("FASTMCP_HOST", "127.0.0.1")
     port = int(os.environ.get("FASTMCP_PORT", "8080"))
 
     # Run the server with SSE transport on /sse/ endpoint
-    mcp.run("sse", path="/sse/", port=port)
+    mcp.run("sse", path="/sse/", host=host, port=port)
 
 
 if __name__ == "__main__":
